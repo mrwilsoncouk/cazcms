@@ -1,0 +1,15 @@
+{
+  "fixed_admin_async_error": true,
+  "admin_contains_async_token": false,
+  "admin_syntax_ok": true,
+  "admin_syntax_error": null,
+  "server_syntax_ok": true,
+  "server_syntax_error": null,
+  "woocommerce_importer_page": "/admin/woocommerce-import",
+  "woocommerce_importer_api": "/api/tools/import-woocommerce",
+  "changed_files": [
+    "src/admin/index.html",
+    "src/admin/woocommerce-import.html",
+    "src/server.js"
+  ]
+}

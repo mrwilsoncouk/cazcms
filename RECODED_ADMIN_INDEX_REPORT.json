@@ -1,0 +1,8 @@
+{
+  "base_zip": "/mnt/data/Robocaz-ADMIN-PRODUCT-CATEGORY-FILTERS-PAGINATION-FULL.zip",
+  "file_replaced": "src/admin/index.html",
+  "products_leftbar_uses_load": false,
+  "only_woo_redirect_in_load": false,
+  "admin_syntax_ok": true,
+  "admin_error": null
+}

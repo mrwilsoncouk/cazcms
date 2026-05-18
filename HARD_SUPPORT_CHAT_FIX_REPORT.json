@@ -1,0 +1,19 @@
+{
+  "hard_direct_admin_support_page": "/admin/support-chat-admin",
+  "hard_fixed_admin_links_script": "/admin-direct-links.js",
+  "saved_info_improved_without_replacing_account": true,
+  "admin_can_reply": true,
+  "delete_removes_from_customer_account": true,
+  "users_can_delete_chats": true,
+  "server_syntax_ok": true,
+  "server_error": null,
+  "support_admin_syntax_ok": true,
+  "support_admin_error": null,
+  "changed_files": [
+    "src/server.js",
+    "src/admin/index.html",
+    "src/admin/support-chat-admin.html",
+    "src/admin/admin-direct-links.js",
+    "src/account/index.html"
+  ]
+}

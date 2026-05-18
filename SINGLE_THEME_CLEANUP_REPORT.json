@@ -1,0 +1,34 @@
+{
+  "single_theme_locked": true,
+  "old_duplicate_theme_files_removed": [
+    "src/homepage-style-everywhere.css",
+    "src/account-width-fix.js",
+    "src/final-site-style-fixes.css",
+    "src/final-site-style-fixes.js",
+    "src/direct-account-admin-style.css",
+    "src/direct-account-admin-style.js"
+  ],
+  "style_switching_on_refresh_fixed": true,
+  "account_admin_login_shop_use_one_theme": true,
+  "category_cards_removed": true,
+  "server_syntax_ok": true,
+  "server_error": null,
+  "changed_files": [
+    "src/account-width-fix.js",
+    "src/account/index.html",
+    "src/admin/index.html",
+    "src/admin/product-categories.html",
+    "src/admin/products.html",
+    "src/admin/support-chat-admin.html",
+    "src/admin/support-chat.html",
+    "src/admin/woocommerce-import.html",
+    "src/direct-account-admin-style.css",
+    "src/direct-account-admin-style.js",
+    "src/final-site-style-fixes.css",
+    "src/final-site-style-fixes.js",
+    "src/homepage-style-everywhere.css",
+    "src/robocaz-single-theme.css",
+    "src/robocaz-single-theme.js",
+    "src/server.js"
+  ]
+}

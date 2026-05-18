@@ -1,0 +1,344 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>WooCommerce Importer</title>
+<style>
+body{font-family:Arial,sans-serif;background:#f8fafc;margin:0;padding:24px;color:#111827}
+.card{background:white;border:1px solid #ddd;border-radius:16px;padding:20px;max-width:1100px;margin:0 auto 16px;box-shadow:0 10px 30px rgba(0,0,0,.04)}
+h1{margin-top:0}
+label{font-weight:bold;display:block;margin-bottom:8px}
+textarea{width:100%;min-height:300px;border:1px solid #ccc;border-radius:10px;padding:12px;font-family:monospace}
+input[type=file],select{width:100%;padding:12px;border:1px solid #ccc;border-radius:10px;background:white}
+button{padding:12px 16px;background:#4f46e5;color:white;border:0;border-radius:10px;font-weight:bold;cursor:pointer}
+button.secondary{background:#64748b}
+.notice{margin:12px 0;padding:12px;background:#ecfeff;border:1px solid #a5f3fc;border-radius:10px;color:#155e75}
+.error{background:#fef2f2;border-color:#fecaca;color:#991b1b}
+.good{background:#dcfce7;border-color:#86efac;color:#166534}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.table-wrap{overflow:auto;border:1px solid #e5e7eb;border-radius:12px;margin-top:12px}
+table{width:100%;border-collapse:collapse;background:white}
+th,td{padding:10px;border-bottom:1px solid #e5e7eb;text-align:left}
+th{background:#f8fafc;font-size:12px;text-transform:uppercase;color:#64748b}
+@media(max-width:760px){.grid{grid-template-columns:1fr}}
+</style>
+<link rel="stylesheet" href="/admin-polished-theme.css">
+<link rel="stylesheet" href="/rz-green-storefront.css">
+<link rel="stylesheet" href="/rz-standard-area.css">
+</head>
+<body class="admin-fixed-layout" class="rz-standard-area rz-theme-loaded">
+
+<div class="card">
+  <div class="row" style="justify-content:space-between">
+    <div>
+      <h1>WooCommerce CSV / JSON Importer</h1>
+      <p>Upload a WooCommerce export file, preview it, then import products.</p>
+    </div>
+    <div class="row">
+      <button class="secondary" onclick="location.href='/admin'">Back to Admin</button>
+      <button class="secondary" onclick="location.href='/products'">View Shop</button>
+    </div>
+  </div>
+</div>
+
+<div class="card">
+  <h2>1. Upload your file</h2>
+  <div class="grid">
+    <div>
+      <label for="importFile">Choose CSV or JSON file</label>
+      <input type="file" id="importFile" accept=".csv,.json,text/csv,application/json">
+    </div>
+    <div>
+      <label for="format">File type</label>
+      <select id="format">
+        <option value="auto">Auto detect from filename</option>
+        <option value="json">JSON</option>
+        <option value="csv">CSV</option>
+      </select>
+    </div>
+  </div>
+  <div class="row" style="margin-top:14px">
+    <button onclick="readImportFile()">Load / Preview File</button>
+    <button class="secondary" onclick="clearImporter()">Clear</button>
+  </div>
+  <div id="msg"></div>
+</div>
+
+<div class="card">
+  <h2>2. Preview / editable import JSON</h2>
+  <textarea id="raw" placeholder="After you load a CSV or JSON file, the converted import data will appear here."></textarea>
+  <div class="row" style="margin-top:14px">
+    <button onclick="previewImport()">Preview Products</button>
+    <button onclick="runImport()">Import Products</button>
+  </div>
+  <div id="preview"></div>
+</div>
+
+<script>
+(function(){
+'use strict';
+
+var products = [];
+
+function token(){
+  return localStorage.getItem('cms_token') || '';
+}
+
+function escapeHtml(value){
+  return String(value == null ? '' : value).replace(/[&<>"']/g,function(c){
+    return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];
+  });
+}
+
+function showMessage(text, cls){
+  document.getElementById('msg').innerHTML =
+    '<div class="notice '+(cls || '')+'">'+escapeHtml(text)+'</div>';
+}
+
+function api(path, opts){
+  opts = opts || {};
+  opts.headers = opts.headers || {};
+  opts.headers['Content-Type'] = 'application/json';
+  if(token()) opts.headers.Authorization = 'Bearer ' + token();
+
+  return fetch(path, opts).then(function(r){
+    return r.text().then(function(text){
+      var data = {};
+      try{ data = text ? JSON.parse(text) : {}; }catch(e){ data = { raw:text }; }
+      if(!r.ok) throw new Error(data.error || data.message || 'Request failed');
+      return data;
+    });
+  });
+}
+
+function splitCsvLine(line){
+  var result = [];
+  var current = '';
+  var quote = false;
+
+  for(var i=0;i<line.length;i++){
+    var ch = line[i];
+
+    if(ch === '"'){
+      if(quote && line[i+1] === '"'){
+        current += '"';
+        i++;
+      }else{
+        quote = !quote;
+      }
+    }else if(ch === ',' && !quote){
+      result.push(current);
+      current = '';
+    }else{
+      current += ch;
+    }
+  }
+
+  result.push(current);
+  return result;
+}
+
+function parseCsv(text){
+  var lines = String(text || '').replace(/^\uFEFF/,'').split(/\r?\n/).filter(function(line){
+    return line.trim() !== '';
+  });
+
+  if(lines.length < 2) return [];
+
+  var headers = splitCsvLine(lines[0]).map(function(h){ return h.trim(); });
+
+  return lines.slice(1).map(function(line){
+    var cells = splitCsvLine(line);
+    var obj = {};
+    headers.forEach(function(h,i){
+      obj[h] = cells[i] == null ? '' : cells[i].trim();
+    });
+    return obj;
+  });
+}
+
+function normaliseProduct(p){
+  function field(names){
+    for(var i=0;i<names.length;i++){
+      var name = names[i];
+      if(p[name] != null && String(p[name]).trim() !== '') return p[name];
+    }
+    return '';
+  }
+
+  var imageRaw = field(['Images','images','Image','image']);
+  var images = [];
+
+  if(Array.isArray(p.images)){
+    images = p.images.map(function(img){
+      return img && (img.src || img.url || img);
+    }).filter(Boolean);
+  }else{
+    String(imageRaw).split(/[|,]/).forEach(function(x){
+      x = x.trim();
+      if(x) images.push(x);
+    });
+  }
+
+  var catRaw = field(['Categories','categories','Category','category']);
+  var cats = [];
+
+  if(Array.isArray(p.categories)){
+    cats = p.categories.map(function(c){
+      return c && (c.name || c.slug || c);
+    }).filter(Boolean);
+  }else{
+    String(catRaw).split(/[|,>]/).forEach(function(x){
+      x = x.trim();
+      if(x) cats.push(x);
+    });
+  }
+
+  return {
+    id: field(['id','ID']),
+    name: field(['name','Name','title','Title']) || 'Imported product',
+    slug: field(['slug','Slug']),
+    sku: field(['sku','SKU']),
+    price: field(['price','Price','Regular price','Regular Price','regular_price']),
+    sale_price: field(['sale_price','Sale price','Sale Price']),
+    stock_quantity: field(['stock_quantity','Stock','stock']),
+    description: field(['description','Description','short_description','Short description','Short Description']),
+    images: images.map(function(src){ return { src:src }; }),
+    categories: cats.map(function(name){ return { name:name }; })
+  };
+}
+
+function parseImportData(raw, format){
+  var parsed;
+
+  if(format === 'csv'){
+    parsed = parseCsv(raw);
+  }else{
+    var json = JSON.parse(raw);
+    parsed = Array.isArray(json) ? json : (Array.isArray(json.products) ? json.products : []);
+  }
+
+  return parsed.map(normaliseProduct).filter(function(p){
+    return p.name || p.sku;
+  });
+}
+
+window.readImportFile = function(){
+  var file = document.getElementById('importFile').files[0];
+
+  if(!file){
+    showMessage('Choose a CSV or JSON file first.', 'error');
+    return;
+  }
+
+  var reader = new FileReader();
+
+  reader.onload = function(){
+    try{
+      var text = String(reader.result || '');
+      var selected = document.getElementById('format').value;
+      var detected = selected;
+
+      if(detected === 'auto'){
+        detected = file.name.toLowerCase().endsWith('.csv') ? 'csv' : 'json';
+      }
+
+      products = parseImportData(text, detected);
+
+      if(!products.length){
+        showMessage('File loaded but no products were found.', 'error');
+        return;
+      }
+
+      document.getElementById('raw').value = JSON.stringify({ products:products }, null, 2);
+
+      showMessage('File loaded. Found '+products.length+' products. Preview below before importing.', 'good');
+      previewImport();
+
+    }catch(e){
+      showMessage(e.message || 'Could not read this file.', 'error');
+    }
+  };
+
+  reader.onerror = function(){
+    showMessage('Could not read file.', 'error');
+  };
+
+  reader.readAsText(file);
+};
+
+window.previewImport = function(){
+  try{
+    var raw = document.getElementById('raw').value || '{}';
+    var parsed = JSON.parse(raw);
+    products = Array.isArray(parsed) ? parsed : (Array.isArray(parsed.products) ? parsed.products : []);
+
+    if(!products.length){
+      document.getElementById('preview').innerHTML = '<div class="notice error">No products to preview.</div>';
+      return;
+    }
+
+    var imageCount = products.reduce(function(total,p){
+      return total + ((p.images || []).length || 0);
+    },0);
+
+    var html = '<div class="notice good">Preview: '+products.length+' products, '+imageCount+' images/URLs.</div>';
+    html += '<div class="table-wrap"><table><thead><tr><th>Name</th><th>SKU</th><th>Price</th><th>Stock</th><th>Categories</th><th>Images</th></tr></thead><tbody>';
+
+    products.slice(0,50).forEach(function(p){
+      html += '<tr><td>'+escapeHtml(p.name || p.title)+'</td><td>'+escapeHtml(p.sku)+'</td><td>'+escapeHtml(p.price)+'</td><td>'+escapeHtml(p.stock_quantity || p.stock)+'</td><td>'+escapeHtml((p.categories || []).map(function(c){return c.name || c;}).join(', '))+'</td><td>'+escapeHtml((p.images || []).length)+'</td></tr>';
+    });
+
+    html += '</tbody></table></div>';
+
+    if(products.length > 50) html += '<p>Showing first 50 only.</p>';
+
+    document.getElementById('preview').innerHTML = html;
+
+  }catch(e){
+    document.getElementById('preview').innerHTML = '<div class="notice error">'+escapeHtml(e.message || 'Preview failed')+'</div>';
+  }
+};
+
+window.runImport = function(){
+  try{
+    var raw = document.getElementById('raw').value || '{}';
+    var parsed = JSON.parse(raw);
+    var body = Array.isArray(parsed) ? { products:parsed } : parsed;
+
+    if(!body.products || !body.products.length){
+      showMessage('No products to import.', 'error');
+      return;
+    }
+
+    showMessage('Importing '+body.products.length+' products. Please wait...', '');
+
+    api('/api/tools/import-woocommerce', {
+      method:'POST',
+      body:JSON.stringify(body)
+    }).then(function(result){
+      showMessage('Import complete. Created: '+(result.created || 0)+'. Updated: '+(result.updated || 0)+'. Images: '+(result.imagesImported || 0)+'.', 'good');
+    }).catch(function(e){
+      showMessage(e.message || 'Import failed.', 'error');
+    });
+
+  }catch(e){
+    showMessage(e.message || 'Import failed.', 'error');
+  }
+};
+
+window.clearImporter = function(){
+  products = [];
+  document.getElementById('raw').value = '';
+  document.getElementById('preview').innerHTML = '';
+  document.getElementById('msg').innerHTML = '';
+  document.getElementById('importFile').value = '';
+};
+
+})();
+</script>
+<script src="/rz-theme-loader.js"></script>
+</body>
+</html>

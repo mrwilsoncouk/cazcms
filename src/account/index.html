@@ -1,0 +1,192 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>My Account</title>
+<link rel="stylesheet" href="/admin-polished-theme.css">
+<style>
+:root{--bg:#f0f2f5;--panel:#ffffff;--brand:#1877f2;--text:#1c1e21;--line:#d8dadf}
+*{box-sizing:border-box;border-radius:2px!important}
+body{margin:0;font-family:Inter,Arial,sans-serif;background:var(--bg);color:var(--text)}
+.backbar{background:#fff;border-bottom:1px solid var(--line);padding:8px 12px}
+.backbar a{display:inline-block;background:var(--brand);color:#fff;text-decoration:none;padding:7px 11px;font-weight:800}
+.wrap{max-width:1380px;margin:auto;padding:12px}
+.topbar{background:#fff;border:1px solid var(--line);padding:14px;margin-bottom:12px;box-shadow:0 8px 18px rgba(0,0,0,.05)}
+.topbar h1{margin:0 0 6px;font-size:26px}.topbar p{margin:0;font-size:13px}
+.layout{display:grid;grid-template-columns:260px 1fr;gap:12px}
+.sidebar{background:#f0f2f5;border-right:1px solid var(--line);padding:12px}
+.brand{display:flex;align-items:center;gap:10px;font-size:20px;font-weight:900;margin-bottom:16px}
+.brand:before{content:"";width:28px;height:28px;background:#1877f2;display:inline-block}
+.nav{display:grid;gap:7px}.nav button{background:#fff;color:#1c1e21;border:1px solid var(--line);padding:8px 10px;text-align:left;font-weight:800;cursor:pointer}
+.nav button.active,.nav button:hover{background:#e7f3ff}
+.content{background:#fff;border:1px solid var(--line);padding:14px;box-shadow:0 8px 18px rgba(0,0,0,.05)}
+.tab{display:none}.tab.active{display:block}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px}.card{background:#fff;border:1px solid var(--line);padding:12px}
+.field{margin-bottom:10px}.field label{display:block;margin-bottom:4px;font-weight:900;font-size:13px}
+input,textarea{width:100%;border:1px solid #cfd7c7;padding:8px;background:#fff;font:inherit}
+textarea{min-height:72px}
+.action-btn,button.primary{background:var(--brand);color:#fff;border:1px solid #166fe5;padding:7px 11px;font-weight:900;cursor:pointer}
+.notice{display:none;background:#dcfce7;color:#166534;padding:9px 10px;margin-bottom:10px;border:1px solid #bbf7d0}
+.error-box{display:none;background:#fef2f2;color:#991b1b;padding:9px 10px;margin-bottom:10px;border:1px solid #fecaca;white-space:pre-wrap}
+.address-grid,.saved-address-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.saved-section{background:#fff;border:1px solid var(--line);padding:10px;margin-bottom:10px;box-shadow:0 8px 18px rgba(0,0,0,.05)}
+.saved-section h3{margin:0 0 8px;font-size:14px}.saved-address-card{border:1px solid var(--line);padding:10px;background:#fff}
+.saved-row{display:grid;grid-template-columns:90px 1fr;gap:8px;padding:4px 0;border-bottom:1px solid #edf0ea;font-size:12px}.saved-row:last-child{border-bottom:0}
+.saved-label{font-weight:900;color:#1877f2}.empty-saved{font-size:13px;color:#64748b}
+.orders-table{width:100%;border-collapse:collapse}.orders-table th,.orders-table td{padding:7px 8px;border-bottom:1px solid #edf0ea;text-align:left;font-size:13px}.orders-table th{background:#e7f3ff}
+#supportChat{max-height:260px;overflow:auto}
+.support-thread-toggle{width:100%;display:flex;justify-content:space-between;align-items:center;background:#fff;color:#1c1e21;border:1px solid var(--line);padding:8px 10px;margin-bottom:6px;font-size:13px;cursor:pointer}
+.support-thread-body{display:none;padding:8px;border:1px solid var(--line);border-top:0;margin-bottom:8px;background:#fff}.support-thread-body.open{display:block}
+.chat-msg{padding:7px 9px;margin-bottom:5px;font-size:12px;line-height:1.3;max-width:78%}.user-msg{background:#dff0d0;margin-left:auto}.admin-msg{background:#ececec;margin-right:auto}
+.chat-tools{display:flex;gap:6px;margin:6px 0;flex-wrap:wrap}.chat-tools button{font-size:11px;padding:5px 8px}
+@media(max-width:900px){.layout,.address-grid,.saved-address-grid{grid-template-columns:1fr}.sidebar{border-right:0}}
+</style>
+<link rel="stylesheet" href="/rz-green-storefront.css">
+<link rel="stylesheet" href="/rz-standard-area.css">
+</head>
+<body class="robocaz-account-page rz-standard-area rz-theme-loaded">
+<div class="backbar"><a href="/">← Back to Website</a></div>
+<div class="wrap account-wrap">
+  <div class="topbar"><h1>My Account</h1><p>Manage your profile, orders, addresses, support and wishlist.</p></div>
+  <div class="layout">
+    <aside class="sidebar">
+      <div class="brand">Customer Area</div>
+      <div class="nav">
+        <button type="button" data-tab="dashboard">Dashboard</button>
+        <button type="button" data-tab="orders">Orders</button>
+        <button type="button" data-tab="details">Account Details</button>
+        <button type="button" data-tab="addresses">Billing & Shipping</button>
+        <button type="button" data-tab="wishlist">Wishlist</button>
+        <button type="button" data-tab="support">Support Chat</button>
+      </div>
+    </aside>
+    <main class="content">
+      <div id="saveNotice" class="notice">Saved successfully.</div>
+      <div id="errorBox" class="error-box"></div>
+
+      <section id="dashboard" class="tab active">
+        <h2>Dashboard</h2>
+        <div class="cards">
+          <div class="card"><h3>Total Orders</h3><h1>0</h1></div>
+          <div class="card"><h3>Wishlist Items</h3><h1>0</h1></div>
+          <div class="card"><h3>Support Chats</h3><h1 id="supportCount">0</h1></div>
+        </div>
+      </section>
+
+      <section id="orders" class="tab">
+        <h2>Orders</h2>
+        <table class="orders-table"><thead><tr><th>Order</th><th>Status</th><th>Total</th><th>Date</th></tr></thead><tbody><tr><td>#0001</td><td>Demo</td><td>£0.00</td><td>Today</td></tr></tbody></table>
+      </section>
+
+      <section id="details" class="tab">
+        <h2>Account Details</h2>
+        <div id="detailsSaved"></div>
+        <div class="field"><label>Full Name</label><input id="acc_name" autocomplete="name"></div>
+        <div class="field"><label>Email</label><input id="acc_email" type="email" autocomplete="email"></div>
+        <div class="field"><label>Phone</label><input id="acc_phone" inputmode="numeric" autocomplete="tel"></div>
+        <button type="button" class="action-btn" id="saveAccountBtn">Save Details</button>
+      </section>
+
+      <section id="addresses" class="tab">
+        <h2>Billing & Shipping</h2>
+        <div id="addressSaved"></div>
+        <div class="address-grid">
+          <div>
+            <h3>Billing Address</h3>
+            <div class="field"><label>Billing Name</label><input id="bill_name"></div>
+            <div class="field"><label>Billing Address</label><textarea id="bill_address"></textarea></div>
+            <div class="field"><label>Billing Postcode</label><input id="bill_postcode"></div>
+            <button type="button" class="action-btn" id="saveBillingBtn">Save Billing</button>
+          </div>
+          <div>
+            <h3>Shipping Address</h3>
+            <div class="field"><label>Shipping Name</label><input id="ship_name"></div>
+            <div class="field"><label>Shipping Address</label><textarea id="ship_address"></textarea></div>
+            <div class="field"><label>Shipping Postcode</label><input id="ship_postcode"></div>
+            <button type="button" class="action-btn" id="saveShippingBtn">Save Shipping</button>
+          </div>
+        </div>
+      </section>
+
+      <section id="wishlist" class="tab">
+        <h2>Wishlist</h2><div class="card">No wishlist items yet.</div>
+      </section>
+
+      <section id="support" class="tab">
+        <h2>Support Chat</h2>
+        <div id="supportChat"></div>
+        <div class="field"><label>Your Email</label><input id="support_email" type="email"></div>
+        <div class="field"><label>Message</label><textarea id="support_message"></textarea></div>
+        <button type="button" class="action-btn" id="sendSupportBtn">Send Message</button>
+      </section>
+    </main>
+  </div>
+</div>
+<script>
+(function(){
+  function q(id){return document.getElementById(id)}
+  function val(id){var e=q(id);return e?String(e.value||''):''}
+  function setVal(id,v){var e=q(id);if(e)e.value=v||''}
+  function esc(v){return String(v==null?'':v).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
+  function showSaved(m){var n=q('saveNotice');if(n){n.textContent=m||'Saved successfully.';n.style.display='block';setTimeout(function(){n.style.display='none'},2500)}}
+  function showError(m){var e=q('errorBox');if(e){e.innerHTML=(Array.isArray(m)?m:String(m||'').split('\\n')).map(function(x){return esc(x)}).join('<br>');e.style.display='block'}}
+  function hideError(){var e=q('errorBox');if(e)e.style.display='none'}
+  function validName(v){return String(v||'').trim().length>=2 && /^[A-Za-z][A-Za-z\s'\-.]{1,80}$/.test(String(v||'').trim())}
+  function validEmail(v){return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(v||'').trim())}
+  function validPhone(v){return /^\d{7,15}$/.test(String(v||'').replace(/\s+/g,''))}
+  function validText(v,min){return String(v||'').trim().length>=min}
+  function validPostcode(v){return /^[A-Za-z0-9][A-Za-z0-9\s\-]{2,12}$/.test(String(v||'').trim())}
+  function parseRows(raw){
+    var text=String(raw||'').replace(/\\n/g,'\n').trim();
+    var obj={};
+
+    function take(label,nextLabels){
+      var start=text.indexOf(label+':');
+      if(start<0) return;
+      start += label.length + 1;
+      var end=text.length;
+      nextLabels.forEach(function(n){
+        var i=text.indexOf(n+':', start);
+        if(i>=0 && i<end) end=i;
+      });
+      obj[label]=text.slice(start,end).trim();
+    }
+
+    take('Name',['Email','Phone']);
+    take('Email',['Phone']);
+    take('Phone',[]);
+
+    if(Object.keys(obj).length) return obj;
+
+    text.split('\n').forEach(function(line){
+      var i=line.indexOf(':');
+      if(i>0) obj[line.slice(0,i).trim()]=line.slice(i+1).trim();
+    });
+
+    return obj;
+  }
+
+  function rowsHtml(obj){var keys=Object.keys(obj||{});if(!keys.length)return '<p class="empty-saved">No saved information yet.</p>';return keys.map(function(k){return '<div class="saved-row"><div class="saved-label">'+esc(k)+'</div><div class="saved-value">'+esc(obj[k])+'</div></div>'}).join('')}
+  function renderDetails(){q('detailsSaved').innerHTML='<div class="saved-section"><h3>Saved Account Details</h3>'+rowsHtml(parseRows(localStorage.getItem('saved_account_details')||''))+'</div>'}
+  function renderAddresses(){q('addressSaved').innerHTML='<div class="saved-section"><h3>Current Saved Addresses</h3><div class="saved-address-grid"><div class="saved-address-card"><h3>Billing Address</h3>'+rowsHtml(parseRows(localStorage.getItem('saved_billing_address')||''))+'</div><div class="saved-address-card"><h3>Shipping Address</h3>'+rowsHtml(parseRows(localStorage.getItem('saved_shipping_address')||''))+'</div></div></div>'}
+  function showTab(id){document.querySelectorAll('.tab').forEach(function(t){t.classList.remove('active')});if(q(id))q(id).classList.add('active');document.querySelectorAll('.nav button').forEach(function(b){b.classList.toggle('active',b.dataset.tab===id)});hideError();if(id==='details')renderDetails();if(id==='addresses')renderAddresses();if(id==='support')refreshSupport()}
+  function api(path,opts){opts=opts||{};opts.headers=opts.headers||{};opts.headers['Content-Type']='application/json';var token=localStorage.getItem('cms_token')||'';if(token)opts.headers.Authorization='Bearer '+token;return fetch(path,opts).then(function(r){return r.text().then(function(t){var d={};try{d=t?JSON.parse(t):{}}catch(e){}if(!r.ok)throw new Error(d.error||d.message||'Request failed');return d})})}
+  function supportEmail(){return val('support_email').trim()||localStorage.getItem('support_email')||localStorage.getItem('acc_email')||''}
+
+  function saveAccount(){hideError();var errs=[],name=val('acc_name').trim(),email=val('acc_email').trim(),phone=val('acc_phone').replace(/\\s+/g,'');if(!validName(name))errs.push('Enter a valid full name.');if(!validEmail(email))errs.push('Enter a valid email address.');if(!validPhone(phone))errs.push('Phone must be numbers only, 7 to 15 digits.');if(errs.length){showError(errs);return}localStorage.setItem('saved_account_details','Name: '+name+'\\nEmail: '+email+'\\nPhone: '+phone);localStorage.setItem('acc_email',email);localStorage.setItem('support_email',email);setVal('acc_name','');setVal('acc_email','');setVal('acc_phone','');renderDetails();showSaved('Account details saved.')}
+  function saveBilling(){hideError();var errs=[],name=val('bill_name').trim(),addr=val('bill_address').trim(),pc=val('bill_postcode').trim();if(!validName(name))errs.push('Enter a valid billing name.');if(!validText(addr,8))errs.push('Billing address must be at least 8 characters.');if(!validPostcode(pc))errs.push('Enter a valid billing postcode.');if(errs.length){showError(errs);return}localStorage.setItem('saved_billing_address','Name: '+name+'\\nAddress: '+addr+'\\nPostcode: '+pc);localStorage.setItem('saved_addresses','');setVal('bill_name','');setVal('bill_address','');setVal('bill_postcode','');renderAddresses();showSaved('Billing address saved.')}
+  function saveShipping(){hideError();var errs=[],name=val('ship_name').trim(),addr=val('ship_address').trim(),pc=val('ship_postcode').trim();if(!validName(name))errs.push('Enter a valid shipping name.');if(!validText(addr,8))errs.push('Shipping address must be at least 8 characters.');if(!validPostcode(pc))errs.push('Enter a valid shipping postcode.');if(errs.length){showError(errs);return}localStorage.setItem('saved_shipping_address','Name: '+name+'\\nAddress: '+addr+'\\nPostcode: '+pc);localStorage.setItem('saved_addresses','');setVal('ship_name','');setVal('ship_address','');setVal('ship_postcode','');renderAddresses();showSaved('Shipping address saved.')}
+
+  function toggleThread(id){var b=q('thread-'+id);if(b)b.classList.toggle('open')}
+  async function refreshSupport(){var box=q('supportChat');if(!box)return;var email=supportEmail();if(q('support_email')&&!val('support_email')&&email)setVal('support_email',email);var threads=[];try{if(email){var res=await api('/api/account/support-chat-force?email='+encodeURIComponent(email),{method:'GET'});threads=res.items||[];localStorage.setItem('support_chat_threads',JSON.stringify(threads))}}catch(e){try{threads=JSON.parse(localStorage.getItem('support_chat_threads')||'[]')}catch(_){}}if(q('supportCount'))q('supportCount').textContent=threads.length;box.innerHTML='';if(!threads.length){box.innerHTML='<div class="saved-section"><h3>No support chats</h3><p>Send a message below and replies will appear here.</p></div>';return}threads.forEach(function(t,i){var id=String(t.id||i).replace(/[^a-zA-Z0-9_-]/g,'');var all=[{type:'user',message:t.message}].concat(t.replies||[]);var last=all[all.length-1]||{};var wrap=document.createElement('div');wrap.innerHTML='<button type="button" class="support-thread-toggle"><span><strong>'+esc(t.subject||'Support chat')+'</strong><br><small>'+all.length+' messages · Last: '+esc((last.message||'').slice(0,48))+'</small></span><span>▼</span></button><div class="support-thread-body" id="thread-'+id+'"></div>';wrap.querySelector('button').onclick=function(){toggleThread(id)};var body=wrap.querySelector('.support-thread-body');if(i===0)body.classList.add('open');all.forEach(function(m){var div=document.createElement('div');var admin=m.type==='admin'||m.createdBy;div.className='chat-msg '+(admin?'admin-msg':'user-msg');div.textContent=m.message||'';body.appendChild(div)});var tools=document.createElement('div');tools.className='chat-tools';var r=document.createElement('button');r.type='button';r.textContent='Refresh';r.onclick=refreshSupport;tools.appendChild(r);var d=document.createElement('button');d.type='button';d.textContent='Delete Chat';d.onclick=function(){deleteChat(t.id)};tools.appendChild(d);body.appendChild(tools);box.appendChild(wrap)})}
+  async function deleteChat(id){if(!confirm('Delete this finished support chat?'))return;try{await api('/api/account/support-chat-force/'+encodeURIComponent(id),{method:'DELETE'});await refreshSupport();showSaved('Support chat deleted.')}catch(e){showError(e.message||e)}}
+  function sendSupport(){hideError();var errs=[],email=val('support_email').trim(),msg=val('support_message').trim();if(!validEmail(email))errs.push('Enter a valid email for support.');if(!validText(msg,5))errs.push('Support message must be at least 5 characters.');if(errs.length){showError(errs);return}localStorage.setItem('support_email',email);localStorage.setItem('acc_email',email);api('/api/account/support-chat-force',{method:'POST',body:JSON.stringify({email:email,name:'Customer',subject:'Account support chat',message:msg})}).then(function(){setVal('support_message','');return refreshSupport()}).then(function(){showSaved('Support message sent to admin.')}).catch(function(e){showError(e.message||e)})}
+
+  function init(){document.querySelectorAll('.nav button[data-tab]').forEach(function(b){b.onclick=function(){showTab(b.dataset.tab)}});q('saveAccountBtn').onclick=saveAccount;q('saveBillingBtn').onclick=saveBilling;q('saveShippingBtn').onclick=saveShipping;q('sendSupportBtn').onclick=sendSupport;renderDetails();renderAddresses();refreshSupport();showTab('dashboard');setInterval(refreshSupport,5000)}
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
+})();
+</script>
+<script src="/rz-theme-loader.js"></script>
+</body>
+</html>

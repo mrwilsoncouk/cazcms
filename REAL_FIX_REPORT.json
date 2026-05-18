@@ -1,0 +1,13 @@
+{
+  "admin_buttons_fixed_in_actual_index": true,
+  "support_sends_to_admin_via_api_contact": true,
+  "account_validation_added": true,
+  "admin_syntax_ok": true,
+  "admin_error": null,
+  "account_syntax_ok": true,
+  "account_error": null,
+  "changed_files": [
+    "src/admin/index.html",
+    "src/account/index.html"
+  ]
+}

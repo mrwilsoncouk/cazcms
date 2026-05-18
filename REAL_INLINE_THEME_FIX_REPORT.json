@@ -1,0 +1,14 @@
+{
+  "why_previous_did_not_work": "The live shop/home CSS is inside src/server.js inline template strings. External CSS injection was being overridden/ignored. This patch inserts the condensed square CSS directly into the generated inline <style> for both public layouts.",
+  "inline_public_theme_patched": true,
+  "commerce_theme_forced_if_old_value_commerce": true,
+  "home_condensed": true,
+  "shop_condensed": true,
+  "colours_unified": true,
+  "admin_sidebar_black_removed_in_backend_theme": true,
+  "server_syntax_ok": true,
+  "server_error": null,
+  "changed_files": [
+    "src/server.js"
+  ]
+}

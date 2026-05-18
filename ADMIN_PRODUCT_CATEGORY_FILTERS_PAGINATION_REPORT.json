@@ -1,0 +1,18 @@
+{
+  "base_zip": "/mnt/data/Robocaz-WOO-IMPORTER-WITH-FILE-UPLOAD-FULL.zip",
+  "admin_leftbar_woo_importer_redirect": true,
+  "admin_products_search_filters": true,
+  "admin_categories_search_filters": true,
+  "admin_products_numbered_pagination": true,
+  "admin_categories_numbered_pagination": true,
+  "product_grid_descriptions_hidden": true,
+  "product_detail_page_full_information_visible": true,
+  "admin_syntax_ok": true,
+  "admin_error": null,
+  "server_syntax_ok": true,
+  "server_error": null,
+  "changed_files": [
+    "src/admin/index.html",
+    "src/server.js"
+  ]
+}

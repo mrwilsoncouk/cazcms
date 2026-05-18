@@ -1,0 +1,28 @@
+{
+  "base_used": "/mnt/data/Robocaz-FULL-CMS-PRE-WP-LOGIN-RESTORE.zip",
+  "kept_original_admin_settings_from_uploaded_zip": true,
+  "did_not_replace_settings_function": true,
+  "safe_fixes_applied": [
+    "removed broken pre-state script if present",
+    "fixed malformed onclick quote bugs",
+    "added safe bulk select/delete helpers",
+    "added products/categories checkboxes where missing",
+    "loads products/categories with limit=10000",
+    "restored woo importer backend route if missing",
+    "restored bulk delete backend route if missing"
+  ],
+  "duplicates_removed": {
+    "formatBytes": 1,
+    "backups": 1,
+    "createBackup": 1,
+    "deleteBackup": 1
+  },
+  "admin_syntax_ok": true,
+  "admin_error": null,
+  "server_syntax_ok": true,
+  "server_error": null,
+  "changed_key_files": [
+    "src/admin/index.html",
+    "src/server.js"
+  ]
+}

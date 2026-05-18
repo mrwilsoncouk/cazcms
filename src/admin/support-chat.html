@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Support Chat Admin</title>
+<link rel="stylesheet" href="/admin-polished-theme.css">
+<style>
+body{margin:0;font-family:Inter,Arial,sans-serif;background:#f3f6ef;color:#142016}
+.wrap{max-width:1450px;margin:auto;padding:24px}
+.topbar,.card{background:white;border:1px solid #e3dcc7;border-radius:22px;padding:20px;margin-bottom:18px;box-shadow:0 14px 34px rgba(20,32,22,.06)}
+.topbar{display:flex;justify-content:space-between;gap:12px;align-items:center}
+.toolbar{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+button,.btn{padding:11px 16px;border:0;border-radius:999px;background:#6f9144;color:white;font-weight:800;cursor:pointer;text-decoration:none;display:inline-block}
+button.secondary,.btn.secondary{background:#e6ddc8;color:#142016}
+button.danger{background:#dc2626;color:white}
+input,textarea{padding:12px;border:1px solid #ddd;border-radius:14px;font:inherit;width:100%}
+.layout{display:grid;grid-template-columns:380px 1fr;gap:20px}
+.thread-list{display:grid;gap:10px}
+.thread{border:1px solid #e3dcc7;border-radius:18px;padding:14px;background:#fffaf0;cursor:pointer}
+.thread:hover{outline:3px solid rgba(111,145,68,.15)}
+.thread.active{border-color:#6f9144;box-shadow:0 0 0 3px rgba(111,145,68,.15)}
+.thread-title{font-weight:900}
+.thread-meta{color:#64748b;font-size:13px;margin-top:4px}
+.chatbox{height:480px;overflow:auto;background:#f8faf7;border:1px solid #dfe9d7;border-radius:18px;padding:18px}
+.msg{max-width:78%;padding:12px 14px;border-radius:16px;margin-bottom:12px;white-space:pre-wrap}
+.customer{background:#dff0d0;margin-left:auto}
+.admin{background:#ececec;margin-right:auto}
+.msg small{display:block;opacity:.65;margin-top:6px}
+.notice{display:none;padding:12px 14px;border-radius:14px;margin-bottom:16px;background:#dcfce7;color:#166534}
+.empty{color:#64748b;padding:24px;text-align:center}
+@media(max-width:950px){.layout{grid-template-columns:1fr}.chatbox{height:360px}.topbar{display:block}}
+</style>
+<link rel="stylesheet" href="/rz-green-storefront.css">
+<link rel="stylesheet" href="/rz-standard-area.css">
+</head>
+<body class="admin-fixed-layout" class="rz-standard-area rz-theme-loaded">
+<div class="wrap">
+  <div class="topbar">
+    <div>
+      <h1>Support Chat</h1>
+      <p>Open customer support requests, reply back, or delete finished chats.</p>
+    </div>
+    <div class="toolbar">
+      <a class="btn secondary" href="/admin">Dashboard</a>
+      <a class="btn secondary" href="/admin/products">Products</a>
+      <a class="btn secondary" href="/admin/product-categories">Categories</a>
+      <button onclick="loadThreads()">Refresh</button>
+    </div>
+  </div>
+  <div id="notice" class="notice"></div>
+  <div class="layout">
+    <aside class="card">
+      <h2>Requests</h2>
+      <input id="search" placeholder="Search email/message..." oninput="renderThreads()">
+      <br><br>
+      <div id="threadList" class="thread-list"></div>
+    </aside>
+    <main class="card">
+      <div id="chatPanel" class="empty">Select a support chat to reply.</div>
+    </main>
+  </div>
+</div>
+<script>
+const token = localStorage.getItem('cms_token') || '';
+const state = { threads:[], selected:null };
+function api(path, opts={}){
+  return fetch(path,{...opts,headers:{'Content-Type':'application/json', ...(token?{Authorization:'Bearer '+token}:{}), ...(opts.headers||{})}})
+  .then(async r=>{const text=await r.text(); let data={}; try{data=text?JSON.parse(text):{};}catch{data={raw:text};} if(!r.ok) throw new Error(data.error || data.message || 'Request failed'); return data;});
+}
+function h(v){return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+function notice(t){const n=document.getElementById('notice');n.textContent=t;n.style.display='block';setTimeout(()=>n.style.display='none',2500)}
+function threadMessages(t){
+  const base=[{type:'customer',message:t.message || '',createdAt:t.createdAt || '',name:t.name || t.email || 'Customer'}];
+  const replies=(t.replies||[]).map(r=>({type:r.type || 'admin',message:r.message || '',createdAt:r.createdAt || '',name:r.createdBy || r.name || (r.type==='customer'?'Customer':'Admin')}));
+  return base.concat(replies);
+}
+async function loadThreads(){
+  try{
+    const res=await api('/api/admin/support-chat');
+    state.threads=res.items || [];
+    if(state.selected){ state.selected=state.threads.find(x=>x.id===state.selected.id) || null; }
+    renderThreads(); renderChat();
+  }catch(e){alert(e.message)}
+}
+function renderThreads(){
+  const q=(document.getElementById('search').value||'').toLowerCase();
+  const items=state.threads.filter(t=>JSON.stringify(t).toLowerCase().includes(q));
+  document.getElementById('threadList').innerHTML = items.map(t=>`
+    <div class="thread ${state.selected&&state.selected.id===t.id?'active':''}" onclick="selectThread('${h(t.id)}')">
+      <div class="thread-title">${h(t.email || 'Customer')}</div>
+      <div>${h((t.message||'').slice(0,90))}${(t.message||'').length>90?'...':''}</div>
+      <div class="thread-meta">${h(t.status||'open')} · ${threadMessages(t).length} messages</div>
+    </div>`).join('') || '<div class="empty">No support chats.</div>';
+}
+function selectThread(id){ state.selected=state.threads.find(t=>t.id===id); renderThreads(); renderChat(); }
+function renderChat(){
+  const t=state.selected;
+  if(!t){ document.getElementById('chatPanel').innerHTML='<div class="empty">Select a support chat to reply.</div>'; return; }
+  const messages=threadMessages(t);
+  document.getElementById('chatPanel').innerHTML=`
+    <div class="toolbar" style="justify-content:space-between">
+      <div><h2>${h(t.email || 'Customer')}</h2><p>${h(t.subject || 'Support chat')}</p></div>
+      <button class="danger" onclick="deleteThread('${h(t.id)}')">Delete Chat</button>
+    </div>
+    <div id="chatbox" class="chatbox">${messages.map(m=>`<div class="msg ${m.type==='customer'?'customer':'admin'}">${h(m.message)}<small>${h(m.name||'')} ${h(m.createdAt||'')}</small></div>`).join('')}</div>
+    <br><textarea id="replyText" rows="4" placeholder="Type your reply..."></textarea><br><br>
+    <button onclick="sendReply('${h(t.id)}')">Send Reply</button>`;
+  const box=document.getElementById('chatbox'); box.scrollTop=box.scrollHeight;
+}
+async function sendReply(id){
+  const text=(document.getElementById('replyText').value||'').trim();
+  if(!text){alert('Type a reply first.');return}
+  try{ await api('/api/admin/support-chat/'+id+'/reply',{method:'POST',body:JSON.stringify({message:text})}); notice('Reply sent.'); await loadThreads(); }
+  catch(e){alert(e.message)}
+}
+async function deleteThread(id){
+  if(!confirm('Delete this chat? It will also disappear from the customer My Account area.')) return;
+  try{ await api('/api/admin/support-chat/'+id,{method:'DELETE'}); state.selected=null; notice('Chat deleted.'); await loadThreads(); }
+  catch(e){alert(e.message)}
+}
+loadThreads();
+</script>
+<script src="/rz-theme-loader.js"></script>
+</body>
+</html>

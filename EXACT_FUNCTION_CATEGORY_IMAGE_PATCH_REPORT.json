@@ -1,0 +1,16 @@
+{
+  "exact_functions_patched": true,
+  "categoryCards_returns_empty": true,
+  "categoryCardsForShop_returns_empty": true,
+  "homepage_shop_by_category_section_removed": true,
+  "productMainImage_returns_default_when_missing": true,
+  "productImageStyle_always_uses_image": true,
+  "default_image_path": "/assets/default-product.png",
+  "server_syntax_ok": true,
+  "server_error": null,
+  "changed_files": [
+    "src/server.js",
+    "src/assets/default-product.png",
+    "src/shop-no-categories-default-image.js"
+  ]
+}

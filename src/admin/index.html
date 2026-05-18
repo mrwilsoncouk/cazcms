@@ -1,0 +1,825 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>CMS Admin</title>
+<style>
+:root{--bg:#f0f2f5;--panel:#ffffff;--card:#fff;--muted:#65676b;--text:#1c1e21;--line:#d8dadf;--brand:#1877f2;--danger:#dc2626;--ok:#16a34a}
+*{box-sizing:border-box;border-radius:2px!important}
+body{margin:0;font-family:Inter,system-ui,Arial,sans-serif;background:#f0f2f5;color:var(--text)}
+.login-wrap{min-height:100vh;display:grid;place-items:center;background:#f0f2f5}
+.login{width:min(430px,92vw);background:white;border-radius:2px;padding:28px;box-shadow:0 6px 14px rgba(0,0,0,.08)}
+.login h1{margin:0 0 8px}
+.login p{color:var(--muted)}
+.field{display:grid;gap:7px;margin:14px 0}
+label{font-size:13px;font-weight:800;color:#334155}
+input,textarea,select{width:100%;border:1px solid var(--line);border-radius:2px;padding:11px 12px;font:inherit;background:white}
+textarea{min-height:130px}
+button{border:0;border-radius:2px;padding:10px 14px;font-weight:800;cursor:pointer;background:var(--brand);color:white}
+button.secondary{background:#e5e7eb;color:#111827}
+button.danger{background:var(--danger)}
+button:disabled{opacity:.55;cursor:not-allowed}
+.app{display:grid;grid-template-columns:260px 1fr;min-height:100vh}
+.sidebar{background:#1877f2;color:white;padding:20px;position:sticky;top:0;height:100vh;overflow-y:auto}
+.brand{font-size:20px;font-weight:900;margin-bottom:20px}
+.nav{display:grid;gap:6px;padding-bottom:32px}
+.nav button{background:transparent;text-align:left;color:#cbd5e1;padding:9px 11px;line-height:1.2}
+.nav button.active,.nav button:hover{background:#166fe5;color:white}
+.main{padding:24px;min-width:0}
+.topbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;gap:16px}
+.grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px}
+.card{background:white;border:1px solid var(--line);border-radius:2px;padding:18px;box-shadow:0 10px 30px rgba(15,23,42,.04);margin-bottom:16px}
+.stat{font-size:34px;font-weight:900}
+.table-wrap{overflow:auto;background:white;border:1px solid var(--line);border-radius:2px}
+.table{width:100%;border-collapse:collapse;background:white}
+.table th,.table td{padding:12px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+.table th{font-size:12px;text-transform:uppercase;color:#64748b;background:#f8fafc}
+.row-actions,.toolbar{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.toolbar{margin:14px 0}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.full{grid-column:1/-1}
+.notice{padding:12px 14px;border-radius:2px;margin-bottom:14px;background:#ecfeff;border:1px solid #a5f3fc;color:#155e75}
+.error{background:#fef2f2;border-color:#fecaca;color:#991b1b}
+.badge{display:inline-block;padding:4px 8px;border-radius:2px;background:#e7f3ff;color:#1877f2;font-size:12px;font-weight:800}
+#richEditor{border:1px solid var(--line);border-radius:2px;min-height:190px;padding:14px;background:white}
+.media-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:16px}
+.media-card{border:1px solid var(--line);border-radius:2px;overflow:hidden;background:#fff}
+.media-preview{height:150px;background:#f1f5f9;display:grid;place-items:center}
+.media-preview img{max-width:100%;max-height:150px;object-fit:contain}
+.media-body{padding:12px}
+@media(max-width:900px){.app{grid-template-columns:1fr}.sidebar{height:auto;position:relative}.grid{grid-template-columns:1fr 1fr}.form-grid{grid-template-columns:1fr}}
+@media(max-width:560px){.grid{grid-template-columns:1fr}.topbar{display:block}.main{padding:14px}}
+</style>
+<link rel="stylesheet" href="/admin-theme.css">
+<link rel="stylesheet" href="/admin-polished-theme.css">
+
+<script>
+window.safeAdminNav = function(e, view){
+  if(e){ e.preventDefault(); e.stopPropagation(); }
+  if(view === 'woocommerceImporter'){
+    window.location.href = '/admin/woocommerce-import';
+    return false;
+  }
+  try{
+    if(typeof window.load === 'function'){ window.load(view); return false; }
+    if(typeof load === 'function'){ load(view); return false; }
+    if(window.state){ window.state.view = view; }
+    if(typeof window.render === 'function'){ window.render(); return false; }
+    if(typeof render === 'function'){ render(); return false; }
+  }catch(err){ console.error('Admin navigation failed:', err); }
+  return false;
+};
+window.addEventListener('DOMContentLoaded', function(){
+  document.querySelectorAll('[data-view]').forEach(function(btn){
+    var view = btn.getAttribute('data-view');
+    if(!view) return;
+    btn.onclick = function(ev){ return window.safeAdminNav(ev, view); };
+  });
+});
+</script>
+
+
+<script>
+document.addEventListener('click', function(e){
+  var btn = e.target.closest('button');
+  if(!btn) return;
+  var view = btn.getAttribute('data-view') || '';
+  var text = (btn.textContent || '').trim().toLowerCase();
+  if(view === 'products' || text === 'products'){
+    e.preventDefault(); e.stopImmediatePropagation();
+    window.location.href = '/admin/products';
+  }
+  if(view === 'productCategories' || text === 'product categories'){
+    e.preventDefault(); e.stopImmediatePropagation();
+    window.location.href = '/admin/product-categories';
+  }
+}, true);
+</script>
+
+
+<script>
+document.addEventListener('click', function(e){
+  var btn=e.target.closest('button');
+  if(!btn) return;
+  var view=btn.getAttribute('data-view') || '';
+  var text=(btn.textContent||'').trim().toLowerCase();
+  if(view==='support' || text==='support'){
+    e.preventDefault(); e.stopImmediatePropagation();
+    window.location.href='/admin/support-chat';
+  }
+}, true);
+</script>
+
+<link rel="stylesheet" href="/rz-green-storefront.css">
+<link rel="stylesheet" href="/rz-standard-area.css">
+</head>
+<body class="admin-fixed-layout" class="rz-standard-area rz-theme-loaded">
+<div id="root"></div>
+<script>
+(function(){
+'use strict';
+
+window.addEventListener('error', function(e){
+  var root=document.getElementById('root');
+  if(root && !root.innerHTML.trim()){
+    root.innerHTML='<div style="padding:24px;font-family:Arial"><h1>Admin error</h1><pre>'+esc(e.message||e.error||e)+'</pre></div>';
+  }
+});
+
+var state={
+  token:localStorage.getItem('cms_token')||'',
+  user:null,
+  view:'dashboard',
+  data:{},
+  message:'',
+  error:''
+};
+window.state=state;
+
+var sections=[
+  ['dashboard','Dashboard'],['pages','Pages'],['blog','Blog'],['blogCategories','Blog Categories'],
+  ['products','Products'],['productCategories','Product Categories'],['orders','Orders'],['users','Users'],
+  ['comments','Comments'],['reviews','Home Reviews'],['media','Media'],['imageOptimizer','Image Optimizer'],
+  ['woocommerceImporter','WooCommerce Importer'],['notifications','Notifications'],['emails','Email outbox'],
+  ['jobs','Jobs'],['support','Support'],['errorLogs','Error Logs'],['backups','Backups'],['settings','Settings'],['audit','Audit']
+];
+
+function esc(v){return String(v==null?'':v).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
+function j(v){return JSON.stringify(v).replace(/</g,'\\u003c').replace(/'/g,'&#39;');}
+function byId(id){return document.getElementById(id);}
+function val(id){var el=byId(id);return el?el.value:'';}
+
+function api(path, opts){
+  opts=opts||{};
+  opts.headers=opts.headers||{};
+  opts.headers['Content-Type']='application/json';
+  if(state.token) opts.headers.Authorization='Bearer '+state.token;
+  return fetch(path, opts).then(function(r){
+    return r.text().then(function(text){
+      var data={};
+      try{data=text?JSON.parse(text):{};}catch(e){data={raw:text};}
+      if(!r.ok) throw new Error(data.error||data.message||'Request failed');
+      return data;
+    });
+  });
+}
+
+function setMsg(m){state.message=m;state.error='';render();}
+function setErr(e){state.error=String(e&&e.message?e.message:e);state.message='';render();}
+function allowedSection(key){if(!state.user)return false;if(state.user.role==='admin')return true;return (state.user.sections||[]).indexOf(key)!==-1;}
+function isAdmin(){return state.user&&state.user.role==='admin';}
+function title(v){for(var i=0;i<sections.length;i++){if(sections[i][0]===v)return sections[i][1];}return v;}
+
+function boot(){
+  if(!state.token){render();return;}
+  api('/api/auth/me').then(function(me){
+    state.user=me.user;
+    if(!me.user.isStaff){location.href='/account';return;}
+    return load(state.view);
+  }).catch(function(){
+    localStorage.removeItem('cms_token');
+    state.token='';
+    render();
+  });
+}
+
+function login(ev){
+  if(ev)ev.preventDefault();
+  api('/api/auth/login',{method:'POST',body:JSON.stringify({email:val('email'),password:val('password')})}).then(function(res){
+    state.token=res.token;
+    state.user=res.user;
+    localStorage.setItem('cms_token',res.token);
+    if(!res.user.isStaff){location.href='/account';return;}
+    return load('dashboard');
+  }).catch(setErr);
+}
+window.login=login;
+
+function logout(){
+  api('/api/auth/logout',{method:'POST'}).catch(function(){}).then(function(){
+    localStorage.removeItem('cms_token');
+    state.token='';
+    state.user=null;
+    render();
+  });
+}
+window.logout=logout;
+
+function testApi(){
+  api('/api/health').then(function(r){alert('API OK: '+r.status);}).catch(function(e){alert(e.message);});
+}
+window.testApi=testApi;
+
+function load(view){
+  if(view==='woocommerceImporter'){
+    window.location.href='/admin/woocommerce-import';
+    return;
+  }
+
+  
+
+  
+
+  state.view=view;
+  state.error='';
+  state.message='';
+  var p;
+  if(view==='dashboard') p=api('/api/dashboard').then(function(x){state.data.dashboard=x;});
+  else if(view==='blog') p=Promise.all([api('/api/posts'),api('/api/blog-categories')]).then(function(a){state.data.posts=a[0];state.data.blogCategories=a[1];});
+  else if(view==='blogCategories') p=api('/api/blog-categories').then(function(x){state.data.blogCategories=x;});
+  else if(view==='settings') p=Promise.all([api('/api/settings'),api('/api/themes')]).then(function(a){state.data.settings=a[0];state.data.themes=a[1];});
+  else if(view==='audit') p=api('/api/audit').then(function(x){state.data.audit=x;});
+  else if(view==='productCategories') p=api('/api/product-categories?limit=10000').then(function(x){state.data.productCategories=x;});
+  else if(view==='products') p=Promise.all([api('/api/products?limit=10000'),api('/api/product-categories?limit=10000')]).then(function(a){state.data.products=a[0];state.data.productCategories=a[1];});
+  else if(['pages','posts','orders','users','comments','reviews','media','notifications','emails','jobs','support','errorLogs','backups'].indexOf(view)!==-1) p=api('/api/'+view+'?limit=10000').then(function(x){state.data[view]=x;});
+  else p=Promise.resolve();
+  return p.catch(function(e){state.error=e.message;}).then(render);
+}
+window.load=load;
+
+function render(){
+  var root=byId('root');
+  if(!state.token||!state.user){
+    root.innerHTML='<div class="login-wrap"><form class="login" onsubmit="login(event)">'+
+      '<h1>CMS Admin</h1><p>Log in with your admin account.</p>'+
+      (state.error?'<div class="notice error">'+esc(state.error)+'</div>':'')+
+      '<div class="field"><label>Email</label><input id="email" type="email" required></div>'+
+      '<div class="field"><label>Password</label><input id="password" type="password" required></div>'+
+      '<button type="submit">Login</button> <button class="secondary" type="button" onclick="testApi()">Test API</button>'+
+    '</form></div>';
+    return;
+  }
+  if(!allowedSection(state.view)) state.view=(state.user.sections&&state.user.sections[0])||'dashboard';
+  root.innerHTML='<div class="app"><aside class="sidebar"><div class="brand">CMS Admin</div><div class="nav">'+
+    sections.filter(function(s){return allowedSection(s[0]);}).map(function(s){return '<button class="'+(state.view===s[0]?'active':'')+'" onclick="load(\''+s[0]+'\')">'+esc(s[1])+'</button>';}).join('')+
+    '</div></aside><main class="main"><div class="topbar"><div><h1>'+esc(title(state.view))+'</h1><div style="color:#64748b">'+esc(state.user.email)+' · '+esc(state.user.role)+'</div></div>'+
+    '<div class="row-actions"><button class="secondary" onclick="window.open(\'/\',\'_blank\')">View site</button><button class="secondary" onclick="window.open(\'/account\',\'_blank\')">My Account</button><button class="secondary" onclick="window.open(\'/admin/menu\',\'_blank\')">Open Menu</button>'+(state.user.role==='admin'?'<button onclick="queueBuild()">Rebuild menu/site</button>':'')+'<button class="danger" onclick="logout()">Logout</button></div></div>'+
+    (state.message?'<div class="notice">'+esc(state.message)+'</div>':'')+
+    (state.error?'<div class="notice error">'+esc(state.error)+'</div>':'')+
+    '<div id="content">'+renderView()+'</div></main></div>';
+}
+window.render=render;
+
+function renderView(){
+  if(state.view==='woocommerceImporter'){ window.location.href='/admin/woocommerce-import'; return ''; }
+
+  if(state.view==='dashboard')return dashboard();
+  if(state.view==='pages')return contentList('pages');
+  if(state.view==='products')return products();
+  if(state.view==='productCategories')return productCategories();
+  if(state.view==='blog')return blogPlatform();
+  if(state.view==='blogCategories')return blogCategories();
+  if(state.view==='orders')return orders();
+  if(state.view==='users')return users();
+  if(state.view==='reviews')return reviews();
+  if(state.view==='media')return media();
+  if(state.view==='settings')return settings();
+  if(state.view==='backups')return backups();
+  if(state.view==='support')return support();
+  if(state.view==='imageOptimizer')return imageOptimizer();
+  if(state.view==='woocommerceImporter')return wooImporter();
+  if(state.view==='audit')return audit();
+  if(state.view==='comments')return genericList('comments',['author','content','status','createdAt']);
+  if(state.view==='notifications')return genericList('notifications',['title','message','read','createdAt']);
+  if(state.view==='emails')return genericList('emails',['to','subject','template','status','createdAt']);
+  if(state.view==='jobs')return genericList('jobs',['type','status','createdAt','updatedAt']);
+  if(state.view==='errorLogs')return genericList('errorLogs',['message','path','createdAt']);
+  return '<div class="card">No view.</div>';
+}
+
+function queueBuild(){api('/api/build',{method:'POST'}).then(function(){setMsg('Static site, menu and route manifest rebuilt.');return load(state.view);}).catch(setErr);}
+window.queueBuild=queueBuild;
+
+function dashboard(){
+  var d=state.data.dashboard||{stats:{},navigation:[],recentAudit:[],settings:{}};var s=d.stats||{};
+  return '<div class="grid">'+Object.keys(s).map(function(k){return '<div class="card"><h3>'+esc(k)+'</h3><div class="stat">'+esc(s[k])+'</div></div>';}).join('')+'</div>'+
+  '<div class="card"><h3>Live menu</h3><div>'+((d.navigation||[]).map(function(n){return '<a class="badge" href="'+esc(n.slug)+'" target="_blank">'+esc(n.title)+'</a>';}).join(' ')||'No menu items yet.')+'</div></div>'+
+  '<div class="card"><h3>Recent activity</h3>'+auditTable(d.recentAudit||[])+'</div>';
+}
+
+function selectedIds(prefix){
+  return Array.from(document.querySelectorAll('input[data-bulk="'+prefix+'"]:checked')).map(function(x){return x.value;}).filter(Boolean);
+}
+function toggleBulk(prefix, checked){
+  Array.from(document.querySelectorAll('input[data-bulk="'+prefix+'"]')).forEach(function(x){x.checked=!!checked;});
+}
+function bulkDelete(type,label){
+  var ids=selectedIds(type);
+  if(!ids.length){alert('Select at least one '+label+' first.');return;}
+  if(!confirm('Delete '+ids.length+' selected '+label+'?'))return;
+  var endpoint=type==='productCategories'?'product-categories':type;
+  var chain=Promise.resolve();
+  ids.forEach(function(id){
+    chain=chain.then(function(){return api('/api/'+endpoint+'/'+encodeURIComponent(id),{method:'DELETE'});});
+  });
+  chain.then(function(){setMsg('Deleted '+ids.length+' '+label+'.');return load(state.view);}).catch(setErr);
+}
+window.toggleBulk=toggleBulk;window.bulkDelete=bulkDelete;
+
+function contentList(type){
+  var res=state.data[type]||{items:[]};var items=res.items||[];
+  return '<div class="toolbar"><button onclick="editContent(\''+type+'\')">Create '+(type==='pages'?'page':'post')+'</button><input placeholder="Search..." onkeydown="if(event.key===\'Enter\') searchList(\''+type+'\',this.value)"></div>'+
+  '<div class="table-wrap"><table class="table"><thead><tr><th>Title</th><th>Slug</th><th>Status</th><th>Menu</th><th>Order</th><th>Updated</th><th></th></tr></thead><tbody>'+
+  (items.map(function(item){return '<tr><td>'+esc(item.title)+'</td><td>'+esc(item.slug)+'</td><td><span class="badge">'+esc(item.status)+'</span></td><td>'+(type==='pages'?(item.showInMenu!==false?'Yes':'No'):'-')+'</td><td>'+(type==='pages'?esc(item.menuOrder==null?100:item.menuOrder):'-')+'</td><td>'+esc(item.updatedAt||'')+'</td><td class="row-actions"><button class="secondary" onclick=\'editContent("'+type+'",'+j(item)+')\'>Edit</button><button class="danger" onclick="removeItem(\''+type+'\',\''+esc(item.id)+'\')">Delete</button></td></tr>';}).join('')||'<tr><td colspan="7">No items yet.</td></tr>')+
+  '</tbody></table></div>';
+}
+
+function editContent(type,item){
+  item=item||{};var isPage=type==='pages';
+  byId('content').innerHTML='<div class="card"><h2>'+(item.id?'Edit':'Create')+' '+(isPage?'page':'post')+'</h2><div class="form-grid">'+
+  '<div class="field"><label>Title</label><input id="f_title" value="'+esc(item.title||'')+'"></div>'+
+  '<div class="field"><label>Slug</label><input id="f_slug" value="'+esc(item.slug||'')+'"></div>'+
+  '<div class="field"><label>Status</label><select id="f_status">'+['draft','published','scheduled','archived'].map(function(x){return '<option '+(item.status===x?'selected':'')+'>'+x+'</option>';}).join('')+'</select></div>'+
+  (isPage?'<div class="field"><label>Menu title</label><input id="f_menuTitle" value="'+esc(item.menuTitle||item.title||'')+'"></div><div class="field"><label>Show in menu</label><select id="f_showInMenu"><option value="true" '+(item.showInMenu!==false?'selected':'')+'>yes</option><option value="false" '+(item.showInMenu===false?'selected':'')+'>no</option></select></div><div class="field"><label>Menu order</label><input id="f_menuOrder" type="number" value="'+esc(item.menuOrder==null?100:item.menuOrder)+'"></div>':'')+
+  '<div class="field"><label>SEO title</label><input id="f_seoTitle" value="'+esc(item.seoTitle||'')+'"></div>'+
+  '<div class="field full"><label>SEO description</label><input id="f_seoDescription" value="'+esc(item.seoDescription||'')+'"></div>'+
+  '<div class="field full"><label>Content</label><div id="richEditor" contenteditable="true">'+(item.content||'')+'</div></div></div>'+
+  '<div class="row-actions"><button onclick="saveContent(\''+type+'\',\''+(item.id||'')+'\')">Save</button><button class="secondary" onclick="load(\''+type+'\')">Cancel</button></div></div>';
+}
+window.editContent=editContent;
+
+function saveContent(type,id){
+  var body={title:val('f_title'),slug:val('f_slug'),status:val('f_status'),seoTitle:val('f_seoTitle'),seoDescription:val('f_seoDescription'),content:byId('richEditor').innerHTML,type:type==='pages'?'page':'post'};
+  if(type==='pages'){body.menuTitle=val('f_menuTitle');body.showInMenu=val('f_showInMenu')==='true';body.menuOrder=Number(val('f_menuOrder')||100);}
+  api('/api/'+type+(id?'/'+id:''),{method:id?'PUT':'POST',body:JSON.stringify(body)}).then(function(){setMsg('Saved.');return load(type);}).catch(setErr);
+}
+window.saveContent=saveContent;
+
+
+function adminFilteredProducts(){
+  const res = state.data.products || {items:[]};
+  const items = res.items || [];
+  const f = state.productFilters || {q:'',status:'',category:'',stock:''};
+  const q = String(f.q || '').toLowerCase();
+
+  return items.filter(p=>{
+    const text = JSON.stringify({
+      title:p.title || p.name || '',
+      sku:p.sku || '',
+      slug:p.slug || '',
+      price:p.price || '',
+      stock:p.stock || '',
+      status:p.status || ''
+    }).toLowerCase();
+
+    if(q && !text.includes(q)) return false;
+    if(f.status && String(p.status || '') !== f.status) return false;
+    if(f.category && !(p.categoryIds || []).includes(f.category) && String(p.categoryId || '') !== f.category) return false;
+
+    if(f.stock === 'in') {
+      if(Number(p.stock || 0) <= 0) return false;
+    }
+    if(f.stock === 'out') {
+      if(Number(p.stock || 0) > 0) return false;
+    }
+
+    return true;
+  });
+}
+
+function adminFilteredCategories(){
+  const res = state.data.productCategories || {items:[]};
+  const items = res.items || [];
+  const f = state.categoryFilters || {q:'',showInShop:'',parentId:''};
+  const q = String(f.q || '').toLowerCase();
+
+  return items.filter(c=>{
+    const text = JSON.stringify({
+      name:c.name || '',
+      slug:c.slug || '',
+      description:c.description || '',
+      parentId:c.parentId || '',
+      menuOrder:c.menuOrder || ''
+    }).toLowerCase();
+
+    if(q && !text.includes(q)) return false;
+    if(f.showInShop === 'yes' && c.showInShop === false) return false;
+    if(f.showInShop === 'no' && c.showInShop !== false) return false;
+    if(f.parentId && String(c.parentId || '') !== f.parentId) return false;
+
+    return true;
+  });
+}
+
+function adminPager(key,total){
+  const size = Number(state.adminPageSize || 50);
+  const pageKey = key === 'products' ? 'productPage' : 'categoryPage';
+  const current = Math.max(1, Number(state[pageKey] || 1));
+  const totalPages = Math.max(1, Math.ceil(total / size));
+  if(current > totalPages) state[pageKey] = totalPages;
+  const page = Math.max(1, Math.min(Number(state[pageKey] || 1), totalPages));
+  return { page, totalPages, size, start:(page-1)*size, end:(page-1)*size+size };
+}
+
+function adminPagination(key,pager,total){
+  if(pager.totalPages <= 1) {
+    return `<div class="notice">Showing ${total} item${total===1?'':'s'}.</div>`;
+  }
+
+  let nums = [];
+  const start = Math.max(1, pager.page - 3);
+  const end = Math.min(pager.totalPages, pager.page + 3);
+
+  for(let i=start;i<=end;i++) nums.push(i);
+
+  return `<div class="toolbar">
+    <button class="secondary" ${pager.page<=1?'disabled':''} onclick="setAdminPage('${key}',1)">First</button>
+    <button class="secondary" ${pager.page<=1?'disabled':''} onclick="setAdminPage('${key}',${pager.page-1})">Prev</button>
+    ${nums.map(n=>`<button class="${n===pager.page?'':'secondary'}" onclick="setAdminPage('${key}',${n})">${n}</button>`).join('')}
+    <button class="secondary" ${pager.page>=pager.totalPages?'disabled':''} onclick="setAdminPage('${key}',${pager.page+1})">Next</button>
+    <button class="secondary" ${pager.page>=pager.totalPages?'disabled':''} onclick="setAdminPage('${key}',${pager.totalPages})">Last</button>
+    <span class="badge">Page ${pager.page} of ${pager.totalPages}</span>
+    <span class="badge">${total} total</span>
+  </div>`;
+}
+
+function setAdminPage(key,page){
+  if(key === 'products') state.productPage = page;
+  else state.categoryPage = page;
+  render();
+}
+window.setAdminPage = setAdminPage;
+
+function setProductFilter(key,value){
+  state.productFilters = state.productFilters || {};
+  state.productFilters[key] = value;
+  state.productPage = 1;
+  render();
+}
+window.setProductFilter = setProductFilter;
+
+function setCategoryFilter(key,value){
+  state.categoryFilters = state.categoryFilters || {};
+  state.categoryFilters[key] = value;
+  state.categoryPage = 1;
+  render();
+}
+window.setCategoryFilter = setCategoryFilter;
+
+function setAdminPageSize(value){
+  state.adminPageSize = Number(value || 50);
+  state.productPage = 1;
+  state.categoryPage = 1;
+  render();
+}
+window.setAdminPageSize = setAdminPageSize;
+
+function productAdminFiltersHtml(){
+  const f = state.productFilters || {};
+  const cats = (state.data.productCategories?.items || []);
+  return `<div class="card">
+    <h3>Product search and filters</h3>
+    <div class="form-grid">
+      <div class="field"><label>Search products</label><input value="${h(f.q||'')}" placeholder="Search title, SKU, slug, price..." oninput="setProductFilter('q',this.value)"></div>
+      <div class="field"><label>Status</label><select onchange="setProductFilter('status',this.value)">
+        <option value="" ${!f.status?'selected':''}>All statuses</option>
+        <option value="active" ${f.status==='active'?'selected':''}>Active</option>
+        <option value="published" ${f.status==='published'?'selected':''}>Published</option>
+        <option value="draft" ${f.status==='draft'?'selected':''}>Draft</option>
+        <option value="archived" ${f.status==='archived'?'selected':''}>Archived</option>
+      </select></div>
+      <div class="field"><label>Category</label><select onchange="setProductFilter('category',this.value)">
+        <option value="" ${!f.category?'selected':''}>All categories</option>
+        ${cats.map(c=>`<option value="${h(c.id)}" ${f.category===c.id?'selected':''}>${h(c.name||'Category')}</option>`).join('')}
+      </select></div>
+      <div class="field"><label>Stock</label><select onchange="setProductFilter('stock',this.value)">
+        <option value="" ${!f.stock?'selected':''}>All stock</option>
+        <option value="in" ${f.stock==='in'?'selected':''}>In stock</option>
+        <option value="out" ${f.stock==='out'?'selected':''}>Out of stock</option>
+      </select></div>
+      <div class="field"><label>Rows per page</label><select onchange="setAdminPageSize(this.value)">
+        ${[25,50,100,250,500,1000].map(n=>`<option value="${n}" ${Number(state.adminPageSize||50)===n?'selected':''}>${n}</option>`).join('')}
+      </select></div>
+      <div class="field"><label>Reset</label><button class="secondary" onclick="state.productFilters={q:'',status:'',category:'',stock:''};state.productPage=1;render()">Clear filters</button></div>
+    </div>
+  </div>`;
+}
+
+function categoryAdminFiltersHtml(){
+  const f = state.categoryFilters || {};
+  const cats = (state.data.productCategories?.items || []);
+  return `<div class="card">
+    <h3>Category search and filters</h3>
+    <div class="form-grid">
+      <div class="field"><label>Search categories</label><input value="${h(f.q||'')}" placeholder="Search name, slug, description..." oninput="setCategoryFilter('q',this.value)"></div>
+      <div class="field"><label>Show in shop</label><select onchange="setCategoryFilter('showInShop',this.value)">
+        <option value="" ${!f.showInShop?'selected':''}>All</option>
+        <option value="yes" ${f.showInShop==='yes'?'selected':''}>Visible</option>
+        <option value="no" ${f.showInShop==='no'?'selected':''}>Hidden</option>
+      </select></div>
+      <div class="field"><label>Parent category</label><select onchange="setCategoryFilter('parentId',this.value)">
+        <option value="" ${!f.parentId?'selected':''}>All parents</option>
+        ${cats.map(c=>`<option value="${h(c.id)}" ${f.parentId===c.id?'selected':''}>${h(c.name||'Category')}</option>`).join('')}
+      </select></div>
+      <div class="field"><label>Rows per page</label><select onchange="setAdminPageSize(this.value)">
+        ${[25,50,100,250,500,1000].map(n=>`<option value="${n}" ${Number(state.adminPageSize||50)===n?'selected':''}>${n}</option>`).join('')}
+      </select></div>
+      <div class="field"><label>Reset</label><button class="secondary" onclick="state.categoryFilters={q:'',showInShop:'',parentId:''};state.categoryPage=1;render()">Clear filters</button></div>
+    </div>
+  </div>`;
+}
+
+
+function products(){
+  const filtered = adminFilteredProducts();
+  const pager = adminPager('products', filtered.length);
+  const items = filtered.slice(pager.start, pager.end);
+  const allCount = (state.data.products?.items || []).length;
+
+  return `${productAdminFiltersHtml()}
+  <div class="toolbar">
+    <button onclick="window.editProduct()">Create Product</button>
+    <button class="danger" onclick="window.bulkDelete ? window.bulkDelete('products','products') : bulkDelete('products','products')">Delete Selected</button>
+    <span class="badge">Showing ${items.length} of ${filtered.length} filtered / ${allCount} total</span>
+  </div>
+  ${adminPagination('products', pager, filtered.length)}
+  <table class="table">
+    <thead><tr>
+      <th style="width:42px"><input type="checkbox" onchange="toggleBulk('products',this.checked)"></th>
+      <th>Title</th><th>SKU</th><th>Price</th><th>Stock</th><th>Status</th><th></th>
+    </tr></thead>
+    <tbody>
+      ${items.map(p=>`<tr>
+        <td><input type="checkbox" data-bulk="products" value="${h(p.id)}"></td>
+        <td>${h(p.title||p.name||'Product')}</td>
+        <td>${h(p.sku||'')}</td>
+        <td>${h(p.price??'')}</td>
+        <td>${h(p.stock??'')}</td>
+        <td>${h(p.status||'')}</td>
+        <td class="row-actions">
+          <button class="secondary" onclick='window.editProduct(${js(p)})'>Edit</button>
+          <button class="danger" onclick="window.removeItem('products','${p.id}')">Delete</button>
+        </td>
+      </tr>`).join('') || '<tr><td colspan="7">No products found.</td></tr>'}
+    </tbody>
+  </table>
+  ${adminPagination('products', pager, filtered.length)}`;
+}
+
+
+function editProduct(p){
+  p=p||{};
+  byId('content').innerHTML='<div class="card"><h2>'+(p.id?'Edit':'Create')+' product</h2><div class="form-grid">'+
+  '<div class="field"><label>Title</label><input id="p_title" value="'+esc(p.title||p.name||'')+'"></div>'+
+  '<div class="field"><label>Slug</label><input id="p_slug" value="'+esc(p.slug||'')+'"></div>'+
+  '<div class="field"><label>SKU</label><input id="p_sku" value="'+esc(p.sku||'')+'"></div>'+
+  '<div class="field"><label>Price</label><input id="p_price" type="number" step="0.01" value="'+esc(p.price||0)+'"></div>'+
+  '<div class="field"><label>Stock</label><input id="p_stock" type="number" value="'+esc(p.stock||0)+'"></div>'+
+  '<div class="field"><label>Status</label><select id="p_status">'+['active','published','draft','archived'].map(function(x){return '<option '+(p.status===x?'selected':'')+'>'+x+'</option>';}).join('')+'</select></div>'+
+  '<div class="field"><label>Categories</label><select id="p_categories" multiple>'+((state.data.productCategories&&state.data.productCategories.items)||[]).map(function(c){var sel=(p.categoryIds||[]).indexOf(c.id)!==-1||p.categoryId===c.id;return '<option value="'+esc(c.id)+'" '+(sel?'selected':'')+'>'+esc(c.name)+'</option>';}).join('')+'</select></div>'+
+  '<div class="field"><label>Main image URL</label><input id="p_image" value="'+esc((p.images||[])[0]||'')+'"></div>'+
+  '<div class="field full"><label>Description</label><textarea id="p_description">'+esc(p.description||'')+'</textarea></div></div>'+
+  '<div class="row-actions"><button onclick="saveProduct(\''+(p.id||'')+'\')">Save</button><button class="secondary" onclick="load(\'products\')">Cancel</button></div></div>';
+}
+window.editProduct=editProduct;
+
+function saveProduct(id){
+  var body={title:val('p_title'),name:val('p_title'),slug:val('p_slug'),sku:val('p_sku'),price:Number(val('p_price')),stock:Number(val('p_stock')),status:val('p_status'),description:val('p_description'),categoryIds:Array.from(byId('p_categories').selectedOptions).map(function(o){return o.value;}),images:val('p_image')?[val('p_image')]:[]};
+  api('/api/products'+(id?'/'+id:''),{method:id?'PUT':'POST',body:JSON.stringify(body)}).then(function(){setMsg('Product saved.');return load('products');}).catch(setErr);
+}
+window.saveProduct=saveProduct;
+
+
+function productCategories(){
+  const filtered = adminFilteredCategories();
+  const pager = adminPager('productCategories', filtered.length);
+  const items = filtered.slice(pager.start, pager.end);
+  const allCount = (state.data.productCategories?.items || []).length;
+
+  return `${categoryAdminFiltersHtml()}
+  <div class="toolbar">
+    <button onclick="editCategory()">Create Category</button>
+    <button class="danger" onclick="window.bulkDelete ? window.bulkDelete('productCategories','categories') : bulkDelete('productCategories','categories')">Delete Selected</button>
+    <span class="badge">Showing ${items.length} of ${filtered.length} filtered / ${allCount} total</span>
+  </div>
+  ${adminPagination('productCategories', pager, filtered.length)}
+  <table class="table">
+    <thead><tr>
+      <th style="width:42px"><input type="checkbox" onchange="toggleBulk('productCategories',this.checked)"></th>
+      <th>Name</th><th>Slug</th><th>Parent</th><th>Order</th><th>Shop</th><th></th>
+    </tr></thead>
+    <tbody>
+      ${items.map(c=>`<tr>
+        <td><input type="checkbox" data-bulk="productCategories" value="${h(c.id)}"></td>
+        <td>${h(c.name||'Category')}</td>
+        <td>${h(c.slug||'')}</td>
+        <td>${h(c.parentId||'')}</td>
+        <td>${h(c.menuOrder??'')}</td>
+        <td>${c.showInShop!==false?'Yes':'No'}</td>
+        <td class="row-actions">
+          <button class="secondary" onclick='editCategory(${js(c)})'>Edit</button>
+          <button class="danger" onclick="window.removeItem('product-categories','${c.id}')">Delete</button>
+        </td>
+      </tr>`).join('') || '<tr><td colspan="7">No categories found.</td></tr>'}
+    </tbody>
+  </table>
+  ${adminPagination('productCategories', pager, filtered.length)}`;
+}
+
+
+function editCategory(c){
+  c=c||{};
+  var cats=((state.data.productCategories&&state.data.productCategories.items)||[]).filter(function(x){return x.id!==c.id;});
+  byId('content').innerHTML='<div class="card"><h2>'+(c.id?'Edit':'Create')+' category</h2><div class="form-grid">'+
+  '<div class="field"><label>Name</label><input id="cat_name" value="'+esc(c.name||'')+'"></div>'+
+  '<div class="field"><label>Slug</label><input id="cat_slug" value="'+esc(c.slug||'')+'"></div>'+
+  '<div class="field"><label>Parent category</label><select id="cat_parent"><option value="">None</option>'+cats.map(function(x){return '<option value="'+esc(x.id)+'" '+(c.parentId===x.id?'selected':'')+'>'+esc(x.name)+'</option>';}).join('')+'</select></div>'+
+  '<div class="field"><label>Menu order</label><input id="cat_order" type="number" value="'+esc(c.menuOrder||100)+'"></div>'+
+  '<div class="field"><label>Show in shop</label><select id="cat_show"><option value="true" '+(c.showInShop!==false?'selected':'')+'>yes</option><option value="false" '+(c.showInShop===false?'selected':'')+'>no</option></select></div>'+
+  '<div class="field"><label>Category image URL</label><input id="cat_image" value="'+esc(c.imageUrl||'')+'"></div>'+
+  '<div class="field full"><label>Description</label><textarea id="cat_desc">'+esc(c.description||'')+'</textarea></div></div>'+
+  '<div class="row-actions"><button onclick="saveCategory(\''+(c.id||'')+'\')">Save category</button><button class="secondary" onclick="load(\'productCategories\')">Cancel</button></div></div>';
+}
+window.editCategory=editCategory;
+
+function saveCategory(id){
+  var body={name:val('cat_name'),slug:val('cat_slug'),parentId:val('cat_parent'),menuOrder:Number(val('cat_order')||100),showInShop:val('cat_show')==='true',imageUrl:val('cat_image'),description:val('cat_desc')};
+  api('/api/product-categories'+(id?'/'+id:''),{method:id?'PUT':'POST',body:JSON.stringify(body)}).then(function(){setMsg('Category saved.');return load('productCategories');}).catch(setErr);
+}
+window.saveCategory=saveCategory;
+
+function orders(){return simpleTable('orders',['id','email','total','status','paymentStatus','createdAt']);}
+function users(){if(!isAdmin())return '<div class="notice error">Only admins can manage users.</div>';return simpleTable('users',['name','email','role','createdAt']);}
+function reviews(){return simpleTable('reviews',['name','rating','quote','location','showOnHome']);}
+function genericList(name,cols){return simpleTable(name,cols);}
+function simpleTable(name,cols){
+  var res=state.data[name]||{items:[]};var items=res.items||[];
+  return '<div class="table-wrap"><table class="table"><thead><tr>'+cols.map(function(c){return '<th>'+esc(c)+'</th>';}).join('')+'<th></th></tr></thead><tbody>'+
+  (items.map(function(item){return '<tr>'+cols.map(function(c){return '<td>'+esc(typeof item[c]==='object'?JSON.stringify(item[c]):item[c])+'</td>';}).join('')+'<td><button class="danger" onclick="removeItem(\''+name+'\',\''+esc(item.id)+'\')">Delete</button></td></tr>';}).join('')||'<tr><td colspan="'+(cols.length+1)+'">No items.</td></tr>')+
+  '</tbody></table></div>';
+}
+
+function media(){
+  var res=state.data.media||{items:[]};
+  return '<div class="card"><h3>Upload media</h3><div class="form-grid"><div class="field"><label>File</label><input id="uploadFile" type="file"></div><div class="field"><label>Folder</label><input id="uploadFolder"></div><div class="field full"><label>Alt text</label><input id="uploadAlt"></div></div><button onclick="uploadMedia()">Upload file</button></div>'+
+  '<div class="media-grid">'+((res.items||[]).map(function(m){var img=String(m.mime||'').indexOf('image/')===0;return '<div class="media-card"><div class="media-preview">'+(img?'<img src="'+esc(m.url)+'" alt="'+esc(m.alt||m.name)+'">':'<strong>FILE</strong>')+'</div><div class="media-body"><strong>'+esc(m.name)+'</strong><input readonly value="'+esc(m.url)+'" onclick="this.select()"><div class="row-actions"><button class="danger" onclick="removeItem(\'media\',\''+esc(m.id)+'\')">Delete</button></div></div></div>';}).join('')||'<p>No files uploaded.</p>')+'</div>';
+}
+function fileToBase64(file){return new Promise(function(resolve,reject){var r=new FileReader();r.onload=function(){resolve(r.result);};r.onerror=function(){reject(new Error('Could not read file.'));};r.readAsDataURL(file);});}
+function uploadMedia(){
+  var file=byId('uploadFile').files[0];
+  if(!file){setErr('Choose a file first.');return;}
+  fileToBase64(file).then(function(base64){return api('/api/media/upload',{method:'POST',body:JSON.stringify({name:file.name,mime:file.type||'application/octet-stream',base64:base64,alt:val('uploadAlt'),folder:val('uploadFolder')})});}).then(function(){setMsg('Uploaded.');return load('media');}).catch(setErr);
+}
+window.uploadMedia=uploadMedia;
+
+function backups(){
+  var res=state.data.backups||{items:[]};
+  return '<div class="card"><h2>Backups</h2><button onclick="createBackup()">Create backup</button> <button class="secondary" onclick="load(\'backups\')">Refresh</button></div>'+simpleBackupTable(res.items||[]);
+}
+function simpleBackupTable(items){return '<div class="table-wrap"><table class="table"><thead><tr><th>Name</th><th>Size</th><th>Created by</th><th>Created</th><th></th></tr></thead><tbody>'+(items.map(function(b){return '<tr><td>'+esc(b.name||'Backup')+'</td><td>'+esc(b.size||'')+'</td><td>'+esc(b.createdBy||'')+'</td><td>'+esc(b.createdAt||'')+'</td><td class="row-actions"><button class="secondary" onclick="restoreBackup(\''+esc(b.id)+'\')">Restore</button><button class="danger" onclick="deleteBackup(\''+esc(b.id)+'\')">Delete</button></td></tr>';}).join('')||'<tr><td colspan="5">No backups.</td></tr>')+'</tbody></table></div>';}
+function createBackup(){api('/api/backup/create',{method:'POST'}).then(function(){setMsg('Backup created.');return load('backups');}).catch(setErr);}
+function restoreBackup(id){if(!confirm('Restore this backup?'))return;api('/api/backup/restore/'+id,{method:'POST'}).then(function(){setMsg('Backup restored.');return load('backups');}).catch(setErr);}
+function deleteBackup(id){if(!confirm('Delete this backup?'))return;api('/api/backup/delete/'+id,{method:'DELETE'}).then(function(){setMsg('Backup deleted.');return load('backups');}).catch(setErr);}
+window.createBackup=createBackup;window.restoreBackup=restoreBackup;window.deleteBackup=deleteBackup;
+
+function support(){return simpleTable('support',['email','subject','status','createdAt']);}
+
+function blogPlatform(){return contentBlog();}
+function contentBlog(){
+  var posts=(state.data.posts&&state.data.posts.items)||[];var cats=(state.data.blogCategories&&state.data.blogCategories.items)||[];
+  return '<div class="card"><h2>Blog Platform</h2><button onclick="editBlogPost()">Create post</button> <button class="secondary" onclick="window.open(\'/news\',\'_blank\')">View news</button></div><div id="blogEditor"></div><div class="table-wrap"><table class="table"><thead><tr><th>Title</th><th>Slug</th><th>Category</th><th>Status</th><th>Date</th><th></th></tr></thead><tbody>'+
+  (posts.map(function(p){var cat=(cats.find(function(c){return c.id===p.categoryId;})||{}).name||'';return '<tr><td>'+esc(p.title)+'</td><td>'+esc(p.slug)+'</td><td>'+esc(cat)+'</td><td>'+esc(p.status)+'</td><td>'+esc(p.publishedAt||p.createdAt||'')+'</td><td class="row-actions"><button class="danger" onclick="removeItem(\'posts\',\''+esc(p.id)+'\')">Delete</button></td></tr>';}).join('')||'<tr><td colspan="6">No blog posts.</td></tr>')+
+  '</tbody></table></div>';
+}
+function editBlogPost(){byId('blogEditor').innerHTML='<div class="card">Use Pages/Blog API editor coming next.</div>';}
+window.editBlogPost=editBlogPost;
+function blogCategories(){return simpleTable('blogCategories',['name','slug','description']);}
+
+function wooImporter(){
+  return '<div class="card"><h2>WooCommerce Product Importer</h2><p>Paste WooCommerce REST API JSON or CSV-converted JSON. Images import locally if backend route is installed.</p><div class="field"><label><input id="wcUpdateExisting" type="checkbox" checked> Update existing products</label></div><div class="field"><label>WooCommerce Product JSON</label><textarea id="wcImportJson" rows="18"></textarea></div><button onclick="runWooImport()">Import Products + Images</button><div id="wcImportResult"></div></div>';
+}
+function runWooImport(){
+  var parsed;
+  try{parsed=JSON.parse(val('wcImportJson')||'{}');}catch(e){setErr('Invalid JSON');return;}
+  var body=Array.isArray(parsed)?{products:parsed}:parsed;
+  body.updateExisting=byId('wcUpdateExisting').checked!==false;
+  api('/api/tools/import-woocommerce',{method:'POST',body:JSON.stringify(body)}).then(function(res){
+    byId('wcImportResult').innerHTML='<div class="notice">Imported. Created: '+esc(res.created||0)+'. Updated: '+esc(res.updated||0)+'. Images saved locally: '+esc(res.imagesImported||0)+'.</div>';
+    setMsg('WooCommerce import complete.');
+  }).catch(setErr);
+}
+window.runWooImport=runWooImport;
+
+function imageOptimizer(){
+  var s=state.data.settings||{},io=s.imageOptimization||{};
+  return '<div class="card"><h2>Image Optimizer</h2><p>Optimise CMS image references.</p><p>Last run: '+esc(io.lastRunAt||'Never')+'</p><button onclick="runImageOptimizer()">Optimise all images</button></div>';
+}
+function runImageOptimizer(){if(!confirm('Optimise all CMS images now?'))return;api('/api/images/optimize',{method:'POST'}).then(function(res){setMsg('Image optimisation complete. Images scanned: '+esc((res.result&&res.result.imageCount)||0));return load('imageOptimizer');}).catch(setErr);}
+window.runImageOptimizer=runImageOptimizer;
+
+function settings(){
+  var s=state.data.settings||{},themes=state.data.themes||{themes:[]},b=s.themeBoxBackgrounds||{};
+  return '<div class="card"><h2>Site settings</h2><div class="form-grid">'+
+  '<div class="field"><label>Site name</label><input id="siteName" value="'+esc(s.siteName||'')+'"></div>'+
+  '<div class="field"><label>Theme</label><select id="theme">'+((themes.themes||[]).map(function(t){return '<option value="'+esc(t.id)+'" '+((s.theme||'simple')===t.id?'selected':'')+'>'+esc(t.name)+'</option>';}).join(''))+'</select></div>'+
+  '<div class="field"><label>Logo URL</label><input id="logoUrl" value="'+esc(s.logoUrl||'')+'"></div>'+
+  '<div class="field"><label>Logo size</label><input id="logoSize" type="number" value="'+esc(s.logoSize||42)+'"></div>'+
+  '<div class="field"><label>Header space above logo</label><input id="headerLogoPaddingTop" type="number" value="'+esc(s.headerLogoPaddingTop==null?18:s.headerLogoPaddingTop)+'"></div>'+
+  '<div class="field"><label>Header space below logo</label><input id="headerLogoPaddingBottom" type="number" value="'+esc(s.headerLogoPaddingBottom==null?18:s.headerLogoPaddingBottom)+'"></div>'+
+  '<div class="field"><label>Currency</label><input id="currency" value="'+esc(s.currency||'GBP')+'"></div>'+
+  '<div class="field"><label>Tax rate %</label><input id="taxRate" type="number" value="'+esc(s.taxRate==null?20:s.taxRate)+'"></div>'+
+  ['homeBox','winSetup','seasonDeals','whyChoose','offerWeek'].map(function(k){return '<div class="field"><label>'+esc(k)+' image URL</label><input id="bg_'+k+'" value="'+esc(b[k]||'')+'"></div>';}).join('')+
+  '</div><button onclick="saveSettings()">Save settings</button></div>';
+}
+function saveSettings(){
+  api('/api/settings',{method:'PUT',body:JSON.stringify({siteName:val('siteName'),theme:val('theme'),logoUrl:val('logoUrl'),logoSize:Number(val('logoSize')||42),headerLogoPaddingTop:Number(val('headerLogoPaddingTop')||18),headerLogoPaddingBottom:Number(val('headerLogoPaddingBottom')||18),currency:val('currency'),taxRate:Number(val('taxRate')||20),themeBoxBackgrounds:{homeBox:val('bg_homeBox'),winSetup:val('bg_winSetup'),seasonDeals:val('bg_seasonDeals'),whyChoose:val('bg_whyChoose'),offerWeek:val('bg_offerWeek')}})}).then(function(){setMsg('Settings saved.');return load('settings');}).catch(setErr);
+}
+window.saveSettings=saveSettings;
+
+function audit(){return '<div class="card">'+auditTable(state.data.audit||[])+'</div>';}
+function auditTable(items){return '<div class="table-wrap"><table class="table"><thead><tr><th>User</th><th>Action</th><th>Target</th><th>Date</th></tr></thead><tbody>'+(items.map(function(a){return '<tr><td>'+esc(a.user)+'</td><td>'+esc(a.action)+'</td><td>'+esc(a.target)+'</td><td>'+esc(a.createdAt)+'</td></tr>';}).join('')||'<tr><td colspan="4">No activity.</td></tr>')+'</tbody></table></div>';}
+
+function removeItem(type,id){
+  if(!confirm('Delete this item?'))return;
+  api('/api/'+type+'/'+encodeURIComponent(id),{method:'DELETE'}).then(function(){setMsg('Deleted.');return load(state.view);}).catch(setErr);
+}
+window.removeItem=removeItem;
+function searchList(type,q){api('/api/'+type+'?q='+encodeURIComponent(q)+'&limit=10000').then(function(x){state.data[type]=x;render();}).catch(setErr);}
+window.searchList=searchList;
+
+window.load = load;
+boot();
+
+})();
+</script>
+
+
+
+<script src="/admin-direct-links.js"></script>
+<script src="/rz-theme-loader.js"></script>
+
+<link rel="stylesheet" href="/admin/pp-theme.css">
+
+<script>
+(function(){
+
+function applyPPTheme(enabled){
+  if(enabled){
+    document.body.classList.add('pp-theme');
+  }else{
+    document.body.classList.remove('pp-theme');
+  }
+  localStorage.setItem('pp-theme-enabled', enabled ? '1' : '0');
+}
+
+window.addEventListener('DOMContentLoaded', function(){
+
+  const topbar = document.querySelector('.topbar');
+
+  if(topbar){
+
+    const wrap = document.createElement('div');
+    wrap.style.display = 'flex';
+    wrap.style.gap = '10px';
+    wrap.style.alignItems = 'center';
+
+    wrap.innerHTML = `
+      <label style="font-weight:700">Theme</label>
+
+      <select id="pp-theme-switcher">
+        <option value="default">Default</option>
+        <option value="pp">PP Theme</option>
+      </select>
+
+      <button id="pp-lock-btn">Lock CMS</button>
+    `;
+
+    topbar.appendChild(wrap);
+
+    const savedTheme = localStorage.getItem('pp-theme-enabled') === '1';
+
+    if(savedTheme){
+      document.getElementById('pp-theme-switcher').value = 'pp';
+      applyPPTheme(true);
+    }
+
+    document.getElementById('pp-theme-switcher').addEventListener('change', function(){
+      applyPPTheme(this.value === 'pp');
+    });
+
+    async function updateLockButton(){
+      try{
+        const r = await fetch('/api/cms-lock');
+        const d = await r.json();
+        document.getElementById('pp-lock-btn').textContent = d.locked ? 'Unlock CMS' : 'Lock CMS';
+      }catch(e){}
+    }
+
+    document.getElementById('pp-lock-btn').addEventListener('click', async function(){
+      const r = await fetch('/api/cms-lock/toggle',{method:'POST'});
+      const d = await r.json();
+      this.textContent = d.locked ? 'Unlock CMS' : 'Lock CMS';
+      alert(d.locked ? 'CMS Locked' : 'CMS Unlocked');
+    });
+
+    updateLockButton();
+  }
+
+});
+
+})();
+</script>
+
+</body>
+</html>

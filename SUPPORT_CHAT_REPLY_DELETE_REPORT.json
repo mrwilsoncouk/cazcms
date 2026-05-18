@@ -1,0 +1,20 @@
+{
+  "my_account_style_locked": true,
+  "saved_info_improved": true,
+  "admin_support_chat_clickable": "/admin/support-chat",
+  "admin_can_reply": true,
+  "delete_removes_from_customer_account": true,
+  "users_can_delete_own_chats": true,
+  "server_syntax_ok": true,
+  "server_error": null,
+  "admin_support_page_syntax_ok": true,
+  "admin_support_page_error": null,
+  "account_syntax_ok": true,
+  "account_error": null,
+  "changed_files": [
+    "src/server.js",
+    "src/admin/index.html",
+    "src/admin/support-chat.html",
+    "src/account/index.html"
+  ]
+}

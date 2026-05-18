@@ -1,0 +1,23 @@
+{
+  "upload_options_added": true,
+  "file_input_present": true,
+  "supports": [
+    "CSV file upload",
+    "JSON file upload",
+    "preview",
+    "editable JSON",
+    "import"
+  ],
+  "page_has_no_async_token": true,
+  "page_syntax_ok": true,
+  "page_error": null,
+  "admin_link_added": false,
+  "server_route_patched": false,
+  "server_syntax_ok": true,
+  "server_error": null,
+  "changed_files": [
+    "src/admin/woocommerce-import.html",
+    "src/admin/index.html",
+    "src/server.js"
+  ]
+}

@@ -1,0 +1,24 @@
+{
+  "direct_patch_for_account_admin_login": true,
+  "static_html_patched": true,
+  "admin_buttons_match_site": true,
+  "account_buttons_match_site": true,
+  "account_width_fixed": true,
+  "admin_width_fixed": true,
+  "login_pages_styled": true,
+  "category_cards_removed": true,
+  "server_syntax_ok": true,
+  "server_error": null,
+  "changed_files": [
+    "src/account/index.html",
+    "src/admin/index.html",
+    "src/admin/product-categories.html",
+    "src/admin/products.html",
+    "src/admin/support-chat-admin.html",
+    "src/admin/support-chat.html",
+    "src/admin/woocommerce-import.html",
+    "src/direct-account-admin-style.css",
+    "src/direct-account-admin-style.js",
+    "src/server.js"
+  ]
+}

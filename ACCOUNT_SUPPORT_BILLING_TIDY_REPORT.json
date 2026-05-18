@@ -1,0 +1,14 @@
+{
+  "support_dropdown_condensed": true,
+  "users_can_delete_finished_chat": true,
+  "billing_shipping_single_saved_address_each": true,
+  "wrong_or_old_address_not_appended": true,
+  "account_syntax_ok": true,
+  "account_error": null,
+  "server_syntax_ok": true,
+  "server_error": null,
+  "changed_files": [
+    "src/account/index.html",
+    "src/server.js"
+  ]
+}

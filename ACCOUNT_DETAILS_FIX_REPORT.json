@@ -1,0 +1,14 @@
+{
+  "account_details_validation_fixed": true,
+  "name_with_spaces_accepted": true,
+  "email_validation_fixed": true,
+  "phone_validation_fixed": true,
+  "saved_account_details_display_rows_fixed": true,
+  "old_one_line_saved_data_migrates_visually": true,
+  "error_messages_line_breaks_fixed": true,
+  "account_syntax_ok": true,
+  "account_error": null,
+  "changed_files": [
+    "src/account/index.html"
+  ]
+}

@@ -1,0 +1,7 @@
+{
+  "name": "Default Static Theme",
+  "tokens": { "color": "#111111", "font": "system-ui", "radius": "12px" },
+  "layouts": { "header": "header.html", "footer": "footer.html" },
+  "templates": { "post": "post.html", "page": "page.html", "product": "product.html" },
+  "blocks": ["hero", "richText", "gallery", "productGrid", "form", "cta"]
+}

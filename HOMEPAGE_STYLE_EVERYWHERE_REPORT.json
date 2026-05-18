@@ -1,0 +1,22 @@
+{
+  "base_zip_used": "Robocaz-EXACT-FUNCTION-CATEGORY-IMAGE-PATCH-FULL.zip",
+  "homepage_style_applied_everywhere": true,
+  "my_account_width_fixed": true,
+  "menu_builder_styled_to_match_homepage": true,
+  "square_condensed_style": true,
+  "wishlist_changes_not_added": true,
+  "server_syntax_ok": true,
+  "server_error": null,
+  "changed_files": [
+    "src/account-width-fix.js",
+    "src/account/index.html",
+    "src/admin/index.html",
+    "src/admin/product-categories.html",
+    "src/admin/products.html",
+    "src/admin/support-chat-admin.html",
+    "src/admin/support-chat.html",
+    "src/admin/woocommerce-import.html",
+    "src/homepage-style-everywhere.css",
+    "src/server.js"
+  ]
+}

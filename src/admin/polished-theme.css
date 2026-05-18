@@ -1,0 +1,257 @@
+*{border-radius:2px!important}
+/* ROBOCAZ POLISHED ADMIN + ACCOUNT THEME */
+:root{
+  --rc-bg:#f3f6ef;
+  --rc-bg-2:#eaf0df;
+  --rc-panel:#0f1b14;
+  --rc-panel-2:#17261b;
+  --rc-card:#fffaf0;
+  --rc-card-2:#ffffff;
+  --rc-text:#142016;
+  --rc-muted:#63705e;
+  --rc-line:#e3dcc7;
+  --rc-brand:#6f9144;
+  --rc-brand-2:#91b956;
+  --rc-brand-dark:#3d5528;
+  --rc-gold:#d99a2b;
+  --rc-danger:#dc2626;
+  --rc-shadow:0 18px 44px rgba(20,32,22,.10);
+  --rc-radius:22px;
+}
+
+*{box-sizing:border-box}
+
+body{
+  background:
+    radial-gradient(circle at 12% 4%,rgba(145,185,86,.20),transparent 28%),
+    radial-gradient(circle at 85% 0%,rgba(217,154,43,.13),transparent 24%),
+    linear-gradient(180deg,var(--rc-bg),#f8faf5)!important;
+  color:var(--rc-text)!important;
+  font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif!important;
+}
+
+.login-wrap{
+  background:
+    radial-gradient(circle at 20% 10%,rgba(145,185,86,.28),transparent 30%),
+    radial-gradient(circle at 80% 0%,rgba(217,154,43,.20),transparent 28%),
+    linear-gradient(135deg,#07110c,#1d2f1d 55%,#0f1b14)!important;
+}
+
+.login{
+  background:rgba(255,250,240,.96)!important;
+  border:1px solid rgba(255,255,255,.38)!important;
+  border-radius:28px!important;
+  box-shadow:0 30px 90px rgba(0,0,0,.35)!important;
+  backdrop-filter:blur(14px);
+}
+
+.login h1{
+  letter-spacing:-.04em;
+  font-size:34px;
+}
+
+.app{
+  background:transparent!important;
+}
+
+.sidebar{
+  background:
+    linear-gradient(180deg,var(--rc-panel),var(--rc-panel-2))!important;
+  border-right:1px solid rgba(255,255,255,.06)!important;
+  box-shadow:12px 0 34px rgba(15,27,20,.14);
+}
+
+.brand{
+  color:white!important;
+  font-size:22px!important;
+  letter-spacing:-.04em;
+  display:flex;
+  align-items:center;
+  gap:10px;
+}
+
+.brand:before{
+  content:"";
+  width:34px;
+  height:34px;
+  border-radius:2px;
+  background:linear-gradient(135deg,var(--rc-brand-2),var(--rc-gold));
+  box-shadow:0 10px 24px rgba(145,185,86,.26);
+}
+
+.nav{
+  gap:8px!important;
+}
+
+.nav button{
+  border-radius:15px!important;
+  color:#dbe8ca!important;
+  font-weight:850!important;
+  letter-spacing:.01em;
+  transition:transform .16s ease, background .16s ease, color .16s ease, box-shadow .16s ease;
+}
+
+.nav button:hover{
+  background:rgba(255,255,255,.09)!important;
+  color:white!important;
+  transform:translateX(3px);
+}
+
+.nav button.active{
+  background:linear-gradient(135deg,var(--rc-brand),var(--rc-brand-dark))!important;
+  color:white!important;
+  box-shadow:0 12px 24px rgba(111,145,68,.26)!important;
+}
+
+.main{
+  padding:28px!important;
+}
+
+.topbar{
+  background:rgba(255,250,240,.72);
+  border:1px solid var(--rc-line);
+  border-radius:var(--rc-radius);
+  padding:18px!important;
+  box-shadow:var(--rc-shadow);
+  backdrop-filter:blur(10px);
+}
+
+.topbar h1{
+  margin:.1em 0;
+  letter-spacing:-.045em;
+  font-size:clamp(28px,3vw,42px);
+}
+
+.card,.panel,section,.page-card,.form-card,.media-card{
+  background:linear-gradient(180deg,var(--rc-card),#fffdf8)!important;
+  border:1px solid var(--rc-line)!important;
+  border-radius:var(--rc-radius)!important;
+  box-shadow:var(--rc-shadow)!important;
+}
+
+.card h2,.card h3{
+  letter-spacing:-.03em;
+}
+
+.table{
+  border-radius:var(--rc-radius)!important;
+  overflow:hidden;
+  border:1px solid var(--rc-line)!important;
+  box-shadow:var(--rc-shadow)!important;
+}
+
+.table th{
+  background:#eef4df!important;
+  color:#526247!important;
+  letter-spacing:.05em;
+  font-size:11px!important;
+}
+
+.table td{
+  background:rgba(255,255,255,.58);
+}
+
+.table tr:hover td{
+  background:#fffaf0;
+}
+
+input,select,textarea{
+  background:#fffdf8!important;
+  border:1px solid var(--rc-line)!important;
+  border-radius:15px!important;
+  color:var(--rc-text)!important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.65);
+  transition:border .16s ease, box-shadow .16s ease, transform .16s ease;
+}
+
+input:focus,select:focus,textarea:focus{
+  outline:none!important;
+  border-color:var(--rc-brand)!important;
+  box-shadow:0 0 0 4px rgba(111,145,68,.16)!important;
+}
+
+label{
+  color:#40513b!important;
+  font-weight:850!important;
+}
+
+button,.btn,input[type=button],input[type=submit]{
+  border:0!important;
+  border-radius:2px!important;
+  background:linear-gradient(135deg,var(--rc-brand),var(--rc-brand-dark))!important;
+  color:white!important;
+  font-weight:900!important;
+  letter-spacing:.01em;
+  box-shadow:0 12px 25px rgba(111,145,68,.24)!important;
+  transition:transform .14s ease, box-shadow .14s ease, filter .14s ease;
+}
+
+button:hover,.btn:hover,input[type=button]:hover,input[type=submit]:hover{
+  transform:translateY(-1px);
+  box-shadow:0 16px 30px rgba(111,145,68,.30)!important;
+  filter:saturate(1.06);
+}
+
+button.secondary,.secondary{
+  background:linear-gradient(135deg,#e9e0c9,#d8cfb5)!important;
+  color:#142016!important;
+  box-shadow:0 10px 22px rgba(20,32,22,.10)!important;
+}
+
+button.danger,.danger{
+  background:linear-gradient(135deg,#ef4444,#b91c1c)!important;
+  color:white!important;
+  box-shadow:0 12px 25px rgba(220,38,38,.24)!important;
+}
+
+.notice{
+  border-radius:2px!important;
+  border:1px solid #a7e0e9!important;
+  background:linear-gradient(135deg,#ecfeff,#f6fffe)!important;
+  box-shadow:0 10px 24px rgba(15,118,110,.08);
+}
+
+.notice.error,.error{
+  border-color:#fecaca!important;
+  background:linear-gradient(135deg,#fef2f2,#fff7f7)!important;
+  color:#991b1b!important;
+}
+
+.badge{
+  border-radius:2px!important;
+  background:#e8efd8!important;
+  color:#385327!important;
+  font-weight:900!important;
+}
+
+.stat{
+  color:#20331f!important;
+  letter-spacing:-.05em;
+}
+
+.media-preview{
+  background:linear-gradient(135deg,#edf4df,#fffaf0)!important;
+}
+
+#richEditor{
+  border:1px solid var(--rc-line)!important;
+  border-radius:2px!important;
+  background:#fffdf8!important;
+}
+
+.account-shell,.account-wrap,.account-page{
+  background:transparent!important;
+}
+
+.account-card,.account-panel,.dashboard-card{
+  background:linear-gradient(180deg,var(--rc-card),#fffdf8)!important;
+  border:1px solid var(--rc-line)!important;
+  border-radius:var(--rc-radius)!important;
+  box-shadow:var(--rc-shadow)!important;
+}
+
+@media(max-width:900px){
+  .main{padding:16px!important}
+  .sidebar{box-shadow:none}
+  .topbar{display:block!important}
+}

@@ -1,0 +1,33 @@
+
+/* PP Theme */
+body.pp-theme{
+  background:#eef7ee !important;
+}
+
+body.pp-theme .sidebar{
+  background:#176b2c !important;
+}
+
+body.pp-theme .nav button.active,
+body.pp-theme .nav button:hover{
+  background:#2f9e44 !important;
+}
+
+body.pp-theme .card,
+body.pp-theme .login,
+body.pp-theme input,
+body.pp-theme textarea,
+body.pp-theme select,
+body.pp-theme table{
+  border-radius:2px !important;
+  border:1px solid #9bd4a5 !important;
+}
+
+body.pp-theme button{
+  background:#2f9e44 !important;
+  border-radius:2px !important;
+}
+
+body.pp-theme .topbar{
+  border-bottom:1px solid #9bd4a5;
+}

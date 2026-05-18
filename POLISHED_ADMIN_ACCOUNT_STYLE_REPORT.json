@@ -1,0 +1,20 @@
+{
+  "style_upgrade": true,
+  "applies_to": [
+    "admin area",
+    "admin login",
+    "Woo importer page",
+    "my account/login if src/account/index.html exists"
+  ],
+  "shared_css_route": "/admin-polished-theme.css",
+  "admin_syntax_ok": true,
+  "admin_error": null,
+  "server_syntax_ok": true,
+  "server_error": null,
+  "changed_files": [
+    "src/admin/polished-theme.css",
+    "src/admin/index.html",
+    "src/admin/woocommerce-import.html",
+    "src/server.js"
+  ]
+}

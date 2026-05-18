@@ -1,0 +1,16 @@
+{
+  "fixed_old_inline_address_render": true,
+  "removed_layout_swap_flicker": true,
+  "billing_shipping_match_account_style": true,
+  "single_current_billing_address": true,
+  "single_current_shipping_address": true,
+  "compact_dropdown_support_preserved": true,
+  "account_syntax_ok": true,
+  "account_error": null,
+  "server_syntax_ok": true,
+  "server_error": null,
+  "changed_files": [
+    "src/account/index.html",
+    "src/server.js"
+  ]
+}

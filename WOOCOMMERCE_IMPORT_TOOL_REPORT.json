@@ -1,0 +1,22 @@
+{
+  "standalone_page": "src/admin/woocommerce-import.html",
+  "frontend_route": "/admin/woocommerce-import",
+  "backend_route": "/api/tools/import-woocommerce",
+  "supports": [
+    "CSV paste",
+    "JSON paste",
+    "preview",
+    "products",
+    "categories",
+    "image URLs"
+  ],
+  "server_syntax_ok": true,
+  "server_error": null,
+  "page_syntax_ok": true,
+  "page_error": null,
+  "changed_files": [
+    "src/admin/woocommerce-import.html",
+    "src/server.js",
+    "src/admin/index.html"
+  ]
+}

@@ -1,0 +1,16 @@
+{
+  "clean_rebuilt_my_account": true,
+  "all_buttons_work": true,
+  "tabs_work": true,
+  "save_details_billing_shipping_work": true,
+  "support_send_refresh_delete_work": true,
+  "single_current_billing_shipping_address": true,
+  "account_syntax_ok": true,
+  "account_error": null,
+  "server_syntax_ok": true,
+  "server_error": null,
+  "changed_files": [
+    "src/account/index.html",
+    "src/server.js"
+  ]
+}

@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Admin Support Chat</title>
+<link rel="stylesheet" href="/admin-polished-theme.css">
+<style>
+:root{--panel:#17261b;--brand:#6f9144;--line:#e3dcc7;--text:#142016}
+*{box-sizing:border-box}
+body{margin:0;font-family:Inter,Arial,sans-serif;background:#f3f6ef;color:var(--text)}
+.wrap{max-width:1450px;margin:auto;padding:24px}
+.topbar,.card{background:white;border:1px solid var(--line);border-radius:22px;padding:20px;margin-bottom:18px;box-shadow:0 14px 34px rgba(20,32,22,.06)}
+.topbar{display:flex;justify-content:space-between;align-items:center;gap:14px}
+.btn,button{padding:11px 16px;border:0;border-radius:999px;background:var(--brand);color:white;font-weight:900;text-decoration:none;cursor:pointer;display:inline-block}
+.btn.secondary,button.secondary{background:#e6ddc8;color:#142016}
+button.danger{background:#dc2626}
+input,textarea{width:100%;padding:12px;border:1px solid #ddd;border-radius:14px;font:inherit}
+.layout{display:grid;grid-template-columns:390px 1fr;gap:20px}
+.thread{background:#fffaf0;border:1px solid var(--line);border-radius:18px;padding:14px;margin-bottom:10px;cursor:pointer}
+.thread:hover,.thread.active{box-shadow:0 0 0 3px rgba(111,145,68,.18);border-color:var(--brand)}
+.meta{font-size:13px;color:#64748b;margin-top:5px}
+.chatbox{height:500px;overflow:auto;background:#f8faf7;border:1px solid #dfe9d7;border-radius:18px;padding:18px}
+.msg{max-width:78%;padding:12px 14px;border-radius:16px;margin-bottom:12px;white-space:pre-wrap}
+.customer{background:#dff0d0;margin-left:auto}
+.admin{background:#ececec;margin-right:auto}
+.msg small{display:block;opacity:.65;margin-top:6px}
+.notice{display:none;background:#dcfce7;color:#166534;border-radius:14px;padding:12px 14px;margin-bottom:14px}
+.toolbar{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+@media(max-width:950px){.layout{grid-template-columns:1fr}.topbar{display:block}.chatbox{height:360px}}
+</style>
+<link rel="stylesheet" href="/rz-green-storefront.css">
+<link rel="stylesheet" href="/rz-standard-area.css">
+</head>
+<body class="admin-fixed-layout" class="rz-standard-area rz-theme-loaded">
+<div class="wrap">
+  <div class="topbar">
+    <div>
+      <h1>Support Chat Admin</h1>
+      <p>Click a customer request, reply, or delete the whole chat.</p>
+    </div>
+    <div class="toolbar">
+      <a class="btn secondary" href="/admin">Dashboard</a>
+      <a class="btn secondary" href="/admin/products">Products</a>
+      <a class="btn secondary" href="/admin/product-categories">Categories</a>
+      <button onclick="loadThreads()">Refresh</button>
+    </div>
+  </div>
+  <div id="notice" class="notice"></div>
+  <div class="layout">
+    <aside class="card">
+      <h2>Customer Chats</h2>
+      <input id="search" placeholder="Search email, name or message..." oninput="renderThreads()">
+      <br><br>
+      <div id="threadList"></div>
+    </aside>
+    <main class="card">
+      <div id="chatPanel" style="color:#64748b;text-align:center;padding:40px">Select a chat to reply.</div>
+    </main>
+  </div>
+</div>
+<script>
+const token=localStorage.getItem('cms_token')||'';
+const state={threads:[],selected:null};
+function api(path,opts={}){
+  return fetch(path,{...opts,headers:{'Content-Type':'application/json',...(token?{Authorization:'Bearer '+token}:{}),...(opts.headers||{})}})
+  .then(async r=>{const t=await r.text();let d={};try{d=t?JSON.parse(t):{}}catch{}if(!r.ok)throw new Error(d.error||d.message||'Request failed');return d;});
+}
+function h(v){return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+function flash(t){notice.textContent=t;notice.style.display='block';setTimeout(()=>notice.style.display='none',2500)}
+function messages(t){
+  return [{type:'customer',message:t.message||'',createdAt:t.createdAt||'',name:t.name||t.email||'Customer'}]
+    .concat((t.replies||[]).map(r=>({type:r.type||'admin',message:r.message||'',createdAt:r.createdAt||'',name:r.createdBy||r.name||'Admin'})));
+}
+async function loadThreads(){
+  try{
+    const res=await api('/api/admin/support-chat-force');
+    state.threads=res.items||[];
+    if(state.selected) state.selected=state.threads.find(x=>x.id===state.selected.id)||null;
+    renderThreads();renderChat();
+  }catch(e){alert(e.message)}
+}
+function renderThreads(){
+  const q=(search.value||'').toLowerCase();
+  const list=state.threads.filter(t=>JSON.stringify(t).toLowerCase().includes(q));
+  threadList.innerHTML=list.map(t=>`
+    <div class="thread ${state.selected&&state.selected.id===t.id?'active':''}" onclick="selectThread('${h(t.id)}')">
+      <strong>${h(t.email||'Customer')}</strong>
+      <div>${h((t.message||'').slice(0,100))}${(t.message||'').length>100?'...':''}</div>
+      <div class="meta">${h(t.status||'open')} · ${messages(t).length} messages · ${h(t.createdAt||'')}</div>
+    </div>`).join('')||'<p style="color:#64748b">No support chats yet.</p>';
+}
+function selectThread(id){state.selected=state.threads.find(t=>t.id===id);renderThreads();renderChat();}
+function renderChat(){
+  const t=state.selected;
+  if(!t){chatPanel.innerHTML='<div style="color:#64748b;text-align:center;padding:40px">Select a chat to reply.</div>';return;}
+  chatPanel.innerHTML=`
+    <div class="toolbar" style="justify-content:space-between">
+      <div><h2>${h(t.email||'Customer')}</h2><p>${h(t.subject||'Support chat')}</p></div>
+      <button class="danger" onclick="deleteThread('${h(t.id)}')">Delete Chat</button>
+    </div>
+    <div id="chatbox" class="chatbox">
+      ${messages(t).map(m=>`<div class="msg ${m.type==='customer'?'customer':'admin'}">${h(m.message)}<small>${h(m.name)} ${h(m.createdAt)}</small></div>`).join('')}
+    </div>
+    <br>
+    <textarea id="replyText" rows="4" placeholder="Type admin reply..."></textarea>
+    <br><br>
+    <button onclick="sendReply('${h(t.id)}')">Send Reply</button>`;
+  chatbox.scrollTop=chatbox.scrollHeight;
+}
+async function sendReply(id){
+  const text=(replyText.value||'').trim();
+  if(!text){alert('Type a reply first.');return;}
+  await api('/api/admin/support-chat-force/'+id+'/reply',{method:'POST',body:JSON.stringify({message:text})});
+  flash('Reply sent.');
+  await loadThreads();
+}
+async function deleteThread(id){
+  if(!confirm('Delete this chat? It will be removed from the customer account too.'))return;
+  await api('/api/admin/support-chat-force/'+id,{method:'DELETE'});
+  state.selected=null;
+  flash('Chat deleted.');
+  await loadThreads();
+}
+loadThreads();
+</script>
+<script src="/rz-theme-loader.js"></script>
+</body>
+</html>

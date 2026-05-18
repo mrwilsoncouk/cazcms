@@ -1,0 +1,124 @@
+
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>CMS Products Manager</title>
+<link rel="stylesheet" href="/admin-polished-theme.css">
+<style>
+body{margin:0;font-family:Inter,Arial,sans-serif;background:#f3f6ef;color:#142016}
+.wrap{max-width:1400px;margin:auto;padding:24px}
+.topbar,.card{background:white;border:1px solid #e3dcc7;border-radius:22px;padding:20px;margin-bottom:18px;box-shadow:0 14px 34px rgba(20,32,22,.06)}
+.topbar{display:flex;justify-content:space-between;gap:12px;align-items:center}
+.toolbar{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+input,select,textarea{padding:12px;border:1px solid #ddd;border-radius:14px;font:inherit}
+button,.btn{padding:11px 16px;border:0;border-radius:999px;background:#6f9144;color:white;font-weight:800;cursor:pointer;text-decoration:none;display:inline-block}
+button.secondary,.btn.secondary{background:#e6ddc8;color:#142016}
+button.danger{background:#dc2626}
+table{width:100%;border-collapse:collapse;background:white;border-radius:18px;overflow:hidden}
+th,td{padding:12px;border-bottom:1px solid #eee;text-align:left;vertical-align:top}
+th{background:#eef4df}
+.row-actions{display:flex;gap:8px;flex-wrap:wrap}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.full{grid-column:1/-1}
+.notice{display:none;padding:12px;border-radius:14px;margin-bottom:16px;background:#dcfce7;color:#166534}
+.error{background:#fef2f2;color:#991b1b}
+.badge{display:inline-block;background:#e8efd8;color:#385327;border-radius:999px;padding:5px 9px;font-weight:800;font-size:12px}
+@media(max-width:900px){.topbar{display:block}.form-grid{grid-template-columns:1fr}}
+</style>
+<link rel="stylesheet" href="/rz-green-storefront.css">
+<link rel="stylesheet" href="/rz-standard-area.css">
+</head>
+<body class="admin-fixed-layout" class="rz-standard-area rz-theme-loaded">
+<div class="wrap">
+<div class="topbar">
+<div><h1 id="title">Manager</h1><p>Standalone manager that bypasses the old admin router.</p></div>
+<div class="toolbar">
+<a class="btn secondary" href="/admin">Dashboard</a>
+<a class="btn secondary" href="/admin/products">Products</a>
+<a class="btn secondary" href="/admin/product-categories">Categories</a>
+<a class="btn secondary" href="/admin/woocommerce-import">Woo Importer</a>
+</div>
+</div>
+<div id="msg" class="notice"></div>
+<div id="err" class="notice error"></div>
+<div class="card"><div class="toolbar">
+<input id="q" placeholder="Search..." oninput="state.page=1;render()">
+<select id="statusFilter" onchange="state.page=1;render()"></select>
+<select id="categoryFilter" onchange="state.page=1;render()"></select>
+<select id="pageSize" onchange="state.page=1;render()"><option>25</option><option selected>50</option><option>100</option><option>250</option><option>500</option><option>1000</option></select>
+<button onclick="newItem()">Create New</button>
+<button class="danger" onclick="bulkDelete()">Delete Selected</button>
+<button class="secondary" onclick="loadData()">Refresh</button>
+</div></div>
+<div id="editor"></div>
+<div id="pagerTop"></div>
+<div class="card"><div style="overflow:auto"><table id="table"></table></div></div>
+<div id="pagerBottom"></div>
+</div>
+<script>
+const token = localStorage.getItem('cms_token') || '';
+const mode = location.pathname.includes('product-categories') ? 'categories' : 'products';
+const state = { items:[], categories:[], page:1 };
+function api(path, opts={}){
+  return fetch(path,{...opts,headers:{'Content-Type':'application/json', ...(token?{Authorization:'Bearer '+token}:{}), ...(opts.headers||{})}})
+  .then(async r=>{const text=await r.text(); let data={}; try{data=text?JSON.parse(text):{};}catch{data={raw:text};} if(!r.ok) throw new Error(data.error || data.message || 'Request failed'); return data;});
+}
+function h(v){return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+function js(v){return JSON.stringify(v).replace(/</g,'\\u003c').replace(/'/g,'&#39;');}
+function show(id,text){const el=document.getElementById(id);el.textContent=text;el.style.display='block';setTimeout(()=>el.style.display='none',2500)}
+function msg(t){show('msg',t)} function err(e){show('err',String(e.message||e))}
+async function loadData(){
+  try{
+    document.getElementById('title').textContent = mode==='products' ? 'Products' : 'Product Categories';
+    state.categories = (await api('/api/product-categories?limit=10000')).items || [];
+    if(mode==='products') state.items = (await api('/api/products?limit=10000')).items || [];
+    else state.items = state.categories;
+    setupFilters(); render();
+  }catch(e){err(e)}
+}
+function setupFilters(){
+  const status=document.getElementById('statusFilter'); const cat=document.getElementById('categoryFilter');
+  if(mode==='products'){
+    status.innerHTML='<option value="">All statuses</option><option value="active">Active</option><option value="published">Published</option><option value="draft">Draft</option><option value="archived">Archived</option>';
+    cat.style.display=''; cat.innerHTML='<option value="">All categories</option>'+state.categories.map(c=>`<option value="${h(c.id)}">${h(c.name||'Category')}</option>`).join('');
+  }else{
+    status.innerHTML='<option value="">All visibility</option><option value="visible">Visible in shop</option><option value="hidden">Hidden</option>'; cat.style.display='none';
+  }
+}
+function filtered(){
+  const q=document.getElementById('q').value.toLowerCase(); const status=document.getElementById('statusFilter').value; const cat=document.getElementById('categoryFilter').value;
+  return state.items.filter(item=>{
+    const text=JSON.stringify(item).toLowerCase(); if(q && !text.includes(q)) return false;
+    if(mode==='products'){ if(status && String(item.status||'')!==status) return false; if(cat && !(item.categoryIds||[]).includes(cat) && String(item.categoryId||'')!==cat) return false; }
+    else { if(status==='visible' && item.showInShop===false) return false; if(status==='hidden' && item.showInShop!==false) return false; }
+    return true;
+  });
+}
+function pager(total){
+  const size=Number(document.getElementById('pageSize').value||50); const pages=Math.max(1,Math.ceil(total/size)); state.page=Math.min(Math.max(1,state.page),pages);
+  const nums=[]; for(let i=Math.max(1,state.page-3);i<=Math.min(pages,state.page+3);i++) nums.push(i);
+  return {size,pages,start:(state.page-1)*size,html:`<div class="card toolbar"><button class="secondary" ${state.page<=1?'disabled':''} onclick="state.page=1;render()">First</button><button class="secondary" ${state.page<=1?'disabled':''} onclick="state.page--;render()">Prev</button>${nums.map(n=>`<button class="${n===state.page?'':'secondary'}" onclick="state.page=${n};render()">${n}</button>`).join('')}<button class="secondary" ${state.page>=pages?'disabled':''} onclick="state.page++;render()">Next</button><button class="secondary" ${state.page>=pages?'disabled':''} onclick="state.page=${pages};render()">Last</button><span class="badge">Page ${state.page} of ${pages}</span><span class="badge">${total} filtered / ${state.items.length} total</span></div>`};
+}
+function render(){const rows=filtered(); const p=pager(rows.length); const pageItems=rows.slice(p.start,p.start+p.size); pagerTop.innerHTML=p.html; pagerBottom.innerHTML=p.html; mode==='products'?renderProducts(pageItems):renderCategories(pageItems);}
+function renderProducts(items){
+  table.innerHTML=`<thead><tr><th><input type="checkbox" onchange="toggleAll(this.checked)"></th><th>Title</th><th>SKU</th><th>Price</th><th>Stock</th><th>Status</th><th>Actions</th></tr></thead><tbody>${items.map(p=>`<tr><td><input type="checkbox" data-id="${h(p.id)}"></td><td>${h(p.title||p.name||'Product')}</td><td>${h(p.sku||'')}</td><td>${h(p.price??'')}</td><td>${h(p.stock??'')}</td><td>${h(p.status||'')}</td><td class="row-actions"><button class="secondary" onclick='editProduct(${js(p)})'>Edit</button><button class="danger" onclick="deleteOne('${h(p.id)}')">Delete</button></td></tr>`).join('') || '<tr><td colspan="7">No products found.</td></tr>'}</tbody>`;
+}
+function renderCategories(items){
+  table.innerHTML=`<thead><tr><th><input type="checkbox" onchange="toggleAll(this.checked)"></th><th>Name</th><th>Slug</th><th>Order</th><th>Visible</th><th>Actions</th></tr></thead><tbody>${items.map(c=>`<tr><td><input type="checkbox" data-id="${h(c.id)}"></td><td>${h(c.name||'Category')}</td><td>${h(c.slug||'')}</td><td>${h(c.menuOrder??'')}</td><td>${c.showInShop!==false?'Yes':'No'}</td><td class="row-actions"><button class="secondary" onclick='editCategory(${js(c)})'>Edit</button><button class="danger" onclick="deleteOne('${h(c.id)}')">Delete</button></td></tr>`).join('') || '<tr><td colspan="6">No categories found.</td></tr>'}</tbody>`;
+}
+function toggleAll(checked){document.querySelectorAll('input[data-id]').forEach(x=>x.checked=checked)}
+function selectedIds(){return Array.from(document.querySelectorAll('input[data-id]:checked')).map(x=>x.dataset.id)}
+async function deleteOne(id){if(!confirm('Delete this item?')) return; try{await api(mode==='products'?'/api/products/'+id:'/api/product-categories/'+id,{method:'DELETE'}); msg('Deleted.'); await loadData();}catch(e){err(e)}}
+async function bulkDelete(){const ids=selectedIds(); if(!ids.length){alert('Select at least one item.');return} if(!confirm('Delete '+ids.length+' selected items?')) return; for(const id of ids){await api(mode==='products'?'/api/products/'+id:'/api/product-categories/'+id,{method:'DELETE'});} msg('Deleted selected items.'); await loadData();}
+function newItem(){mode==='products'?editProduct({}):editCategory({})}
+function editProduct(p={}){editor.innerHTML=`<div class="card"><h2>${p.id?'Edit':'Create'} Product</h2><div class="form-grid"><div><label>Title</label><input id="p_title" value="${h(p.title||'')}"></div><div><label>Slug</label><input id="p_slug" value="${h(p.slug||'')}"></div><div><label>SKU</label><input id="p_sku" value="${h(p.sku||'')}"></div><div><label>Price</label><input id="p_price" type="number" step="0.01" value="${h(p.price||0)}"></div><div><label>Stock</label><input id="p_stock" type="number" value="${h(p.stock||0)}"></div><div><label>Status</label><select id="p_status"><option ${p.status==='active'?'selected':''}>active</option><option ${p.status==='published'?'selected':''}>published</option><option ${p.status==='draft'?'selected':''}>draft</option><option ${p.status==='archived'?'selected':''}>archived</option></select></div><div class="full"><label>Categories</label><select id="p_categories" multiple>${state.categories.map(c=>`<option value="${h(c.id)}" ${(p.categoryIds||[]).includes(c.id)?'selected':''}>${h(c.name)}</option>`).join('')}</select></div><div class="full"><label>Main image URL</label><input id="p_image" value="${h((p.images||[])[0]||'')}"></div><div class="full"><label>Description</label><textarea id="p_desc" style="min-height:160px">${h(p.description||'')}</textarea></div></div><br><button onclick="saveProduct('${h(p.id||'')}')">Save Product</button> <button class="secondary" onclick="editor.innerHTML=''">Cancel</button></div>`}
+async function saveProduct(id){try{const body={title:p_title.value,slug:p_slug.value,sku:p_sku.value,price:Number(p_price.value||0),stock:Number(p_stock.value||0),status:p_status.value,categoryIds:Array.from(p_categories.selectedOptions).map(o=>o.value),images:p_image.value?[p_image.value]:[],description:p_desc.value}; await api('/api/products'+(id?'/'+id:''),{method:id?'PUT':'POST',body:JSON.stringify(body)}); editor.innerHTML=''; msg('Product saved.'); await loadData();}catch(e){err(e)}}
+function editCategory(c={}){editor.innerHTML=`<div class="card"><h2>${c.id?'Edit':'Create'} Category</h2><div class="form-grid"><div><label>Name</label><input id="c_name" value="${h(c.name||'')}"></div><div><label>Slug</label><input id="c_slug" value="${h(c.slug||'')}"></div><div><label>Order</label><input id="c_order" type="number" value="${h(c.menuOrder||100)}"></div><div><label>Visible in shop</label><select id="c_show"><option value="true" ${c.showInShop!==false?'selected':''}>yes</option><option value="false" ${c.showInShop===false?'selected':''}>no</option></select></div><div class="full"><label>Image URL</label><input id="c_image" value="${h(c.imageUrl||'')}"></div><div class="full"><label>Description</label><textarea id="c_desc">${h(c.description||'')}</textarea></div></div><br><button onclick="saveCategory('${h(c.id||'')}')">Save Category</button> <button class="secondary" onclick="editor.innerHTML=''">Cancel</button></div>`}
+async function saveCategory(id){try{const body={name:c_name.value,slug:c_slug.value,menuOrder:Number(c_order.value||100),showInShop:c_show.value==='true',imageUrl:c_image.value,description:c_desc.value}; await api('/api/product-categories'+(id?'/'+id:''),{method:id?'PUT':'POST',body:JSON.stringify(body)}); editor.innerHTML=''; msg('Category saved.'); await loadData();}catch(e){err(e)}}
+loadData();
+</script>
+<script src="/rz-theme-loader.js"></script>
+</body>
+</html>

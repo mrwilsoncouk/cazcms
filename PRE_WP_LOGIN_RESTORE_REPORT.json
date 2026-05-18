@@ -1,0 +1,18 @@
+{
+  "full_base_used": "headless-railway-cms-commerce-railway-admin-fixed.zip",
+  "stable_patch_used": "Robocaz-HEADER-SPACING-BACKEND-THEME-FIX.zip",
+  "wordpress_importer_removed": true,
+  "login_theme_removed": true,
+  "package_scripts_fixed": {
+    "dev": "node src/server.js",
+    "start": "node src/server.js",
+    "build": "node scripts/build.js",
+    "cli": "node cli/cms.js",
+    "test": "node --check src/server.js && node --check src/core/store.js && node --check src/core/security.js && node --check src/core/http.js && node --check src/modules/auth.js && node --check src/modules/cms.js && node --check src/modules/commerce.js && node --check src/modules/platform.js && node --check src/modules/noMissing.js && node --check src/modules/integrations.js && node --check src/modules/performance.js && node --check src/build-static.js && node --check cli/cms.js",
+    "perf:build": "node src/build-static.js",
+    "migrate": "node scripts/migrate.js",
+    "seed": "node scripts/seed.js"
+  },
+  "railway_start_command": "node scripts/migrate.js && node scripts/seed.js && node src/server.js",
+  "server_syntax_ok": true
+}

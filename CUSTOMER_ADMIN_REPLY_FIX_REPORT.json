@@ -1,0 +1,14 @@
+{
+  "customer_gets_admin_replies": true,
+  "how": "My Account now polls /api/account/support-chat-force every 5 seconds using saved support_email/acc_email and renders admin replies from thread replies.",
+  "manual_refresh_button": true,
+  "support_email_persisted": true,
+  "account_syntax_ok": true,
+  "account_error": null,
+  "server_syntax_ok": true,
+  "server_error": null,
+  "changed_files": [
+    "src/account/index.html",
+    "src/server.js"
+  ]
+}

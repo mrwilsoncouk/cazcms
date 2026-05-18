@@ -1,0 +1,14 @@
+{
+  "my_account_locked": true,
+  "product_category_buttons_new_approach": "Standalone admin pages, /admin/products and /admin/product-categories, plus capture redirect in admin header.",
+  "support_chat_backend_added": "/api/account/support-chat",
+  "server_syntax_ok": true,
+  "server_error": null,
+  "changed_files": [
+    "src/server.js",
+    "src/admin/index.html",
+    "src/admin/products.html",
+    "src/admin/product-categories.html",
+    "src/account/index.html"
+  ]
+}
