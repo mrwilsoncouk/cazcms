@@ -1,0 +1,11 @@
+[
+  {
+    "id": "webh_fbb117fdfd922956aba2",
+    "createdAt": "2026-04-30T17:50:46.349Z",
+    "updatedAt": "2026-04-30T17:50:46.349Z",
+    "type": "static-build",
+    "status": "complete",
+    "output": "/mnt/data/headless-railway-cms-full/public/site",
+    "at": "2026-04-30T17:50:46.347Z"
+  }
+]

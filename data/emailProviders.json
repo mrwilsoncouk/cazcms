@@ -1,0 +1,12 @@
+[
+  {
+    "id": "empr_local_default",
+    "createdAt": "2026-04-30T00:00:00.000Z",
+    "updatedAt": "2026-04-30T00:00:00.000Z",
+    "name": "Local CMS Email Outbox",
+    "mode": "local-outbox",
+    "enabled": true,
+    "fromEmail": "no-reply@example.local",
+    "fromName": "CMS"
+  }
+]

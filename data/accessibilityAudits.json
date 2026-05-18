@@ -1,0 +1,16 @@
+[
+  {
+    "id": "perf_1777573290425",
+    "createdAt": "2026-04-30T18:21:30.425Z",
+    "updatedAt": "2026-04-30T18:21:30.425Z",
+    "type": "performance-budget",
+    "budget": {
+      "maxJsBytes": 180000,
+      "maxImageBytes": 450000,
+      "maxPageBytes": 250000,
+      "maxApiMs": 300
+    },
+    "failures": [],
+    "passed": true
+  }
+]

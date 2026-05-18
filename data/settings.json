@@ -1,0 +1,15 @@
+[
+  {
+    "id": "sett_e8b98d16d0b2e3227ab0",
+    "createdAt": "2026-04-30T17:57:24.236Z",
+    "updatedAt": "2026-04-30T17:57:24.236Z",
+    "key": "site",
+    "value": {
+      "name": "Railway Headless CMS Commerce",
+      "locale": "en",
+      "currency": "GBP",
+      "cookieConsent": true,
+      "wcagTarget": "AA"
+    }
+  }
+]

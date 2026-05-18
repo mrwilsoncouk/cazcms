@@ -1,0 +1,14 @@
+[
+  {
+    "id": "audi_ae6e25d30f1ddfd73113",
+    "createdAt": "2026-05-01T14:05:47.680Z",
+    "updatedAt": "2026-05-01T14:05:47.680Z",
+    "actor": "user_c25cd15fca01964fd427",
+    "action": "login",
+    "target": "session",
+    "details": {
+      "ip": "::ffff:127.0.0.1"
+    },
+    "ip": "::ffff:127.0.0.1"
+  }
+]

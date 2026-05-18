@@ -1,0 +1,22 @@
+[
+  {
+    "id": "ship_05d3ac4788ff35c4840f",
+    "createdAt": "2026-04-30T17:57:24.230Z",
+    "updatedAt": "2026-04-30T17:57:24.230Z",
+    "name": "United Kingdom",
+    "countries": [
+      "GB"
+    ],
+    "methods": [
+      {
+        "name": "Standard",
+        "price": 4.99
+      },
+      {
+        "name": "Free over 50",
+        "price": 0,
+        "minSubtotal": 50
+      }
+    ]
+  }
+]

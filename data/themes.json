@@ -1,0 +1,22 @@
+[
+  {
+    "id": "them_957cf3118d156e687ac6",
+    "createdAt": "2026-04-30T17:50:46.933Z",
+    "updatedAt": "2026-04-30T17:50:46.933Z",
+    "name": "Default Static Theme",
+    "enabled": true,
+    "tokens": {
+      "color": "#111",
+      "font": "system-ui"
+    },
+    "layouts": {
+      "header": "Header",
+      "footer": "Footer"
+    },
+    "templates": {
+      "post": "post.html",
+      "page": "page.html",
+      "product": "product.html"
+    }
+  }
+]

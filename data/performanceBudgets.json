@@ -1,0 +1,3 @@
+[
+  {"name":"default","maxJsBytes":180000,"maxImageBytes":450000,"maxPageBytes":250000,"maxApiMs":300,"enforced":true}
+]

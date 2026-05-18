@@ -1,0 +1,8 @@
+[
+  {"table":"content","fields":["slug","status","publishAt","type","locale","authorId"],"purpose":"fast page resolution and admin filters"},
+  {"table":"products","fields":["sku","slug","status","categoryId","price"],"purpose":"fast catalog and product lookup"},
+  {"table":"orders","fields":["customerId","status","createdAt","paymentStatus"],"purpose":"fast order management"},
+  {"table":"users","fields":["email","role","verified"],"purpose":"fast authentication and role filtering"},
+  {"table":"comments","fields":["contentId","status","createdAt"],"purpose":"fast moderation and lazy comments"},
+  {"table":"audit","fields":["actor","action","createdAt"],"purpose":"fast logs and monitoring"}
+]

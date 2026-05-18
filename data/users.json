@@ -1,0 +1,15 @@
+[
+  {
+    "id": "user_c25cd15fca01964fd427",
+    "createdAt": "2026-04-30T17:50:46.915Z",
+    "updatedAt": "2026-04-30T17:50:46.915Z",
+    "email": "admin@example.com",
+    "name": "Admin",
+    "role": "admin",
+    "passwordHash": "a8d3097c5d5a58bf0be85ff4fa4090d2:78dad036c3e2cffa421b6cd052df49e98fe54f978a3e8f5695a43e0e0b33946762a36bcef20eeb4471825b46eeb9a5c775df1430bd09bd75c307e385ced62073",
+    "verified": true,
+    "profile": {},
+    "teams": [],
+    "twoFactor": false
+  }
+]

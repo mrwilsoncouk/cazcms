@@ -1,0 +1,11 @@
+[
+  {
+    "id": "taxR_2d377b2591437101ecb9",
+    "createdAt": "2026-04-30T17:57:24.225Z",
+    "updatedAt": "2026-04-30T17:57:24.225Z",
+    "country": "GB",
+    "region": "*",
+    "rate": 0.2,
+    "name": "UK VAT placeholder"
+  }
+]

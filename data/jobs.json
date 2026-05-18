@@ -1,0 +1,34 @@
+[
+  {
+    "id": "jobs_8f173cdd1cd9a43a5ceb",
+    "createdAt": "2026-04-30T18:21:30.337Z",
+    "updatedAt": "2026-04-30T18:21:30.337Z",
+    "type": "precompute-navigation",
+    "status": "complete",
+    "result": {
+      "pages": 0,
+      "categories": 0,
+      "products": 0
+    }
+  },
+  {
+    "id": "jobs_463d56844e4dbd67704a",
+    "createdAt": "2026-04-30T18:21:30.428Z",
+    "updatedAt": "2026-04-30T18:21:30.428Z",
+    "type": "static-build",
+    "status": "complete",
+    "result": {
+      "pages": 0,
+      "products": 0,
+      "routes": 0,
+      "search": {
+        "documents": 0,
+        "tokens": 0
+      },
+      "compression": {
+        "count": 8
+      },
+      "budget": true
+    }
+  }
+]

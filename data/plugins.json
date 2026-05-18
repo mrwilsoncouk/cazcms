@@ -1,0 +1,19 @@
+[
+  {
+    "id": "plug_59ad04ab18a4578e3887",
+    "createdAt": "2026-04-30T17:57:24.213Z",
+    "updatedAt": "2026-04-30T17:57:24.214Z",
+    "name": "Core Checkout Hooks",
+    "handle": "core-checkout",
+    "enabled": true,
+    "version": "1.0.0",
+    "permissions": [
+      "checkout:extend"
+    ],
+    "hooks": [
+      "checkout.before",
+      "checkout.after"
+    ],
+    "compatibility": ">=2"
+  }
+]

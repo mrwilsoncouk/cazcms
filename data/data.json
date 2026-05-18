@@ -1,0 +1,226 @@
+{
+  "menuItems": [
+    {
+      "id": "menu-home",
+      "label": "Home",
+      "url": "/",
+      "parentId": "",
+      "menuOrder": 10,
+      "visible": true
+    },
+    {
+      "id": "menu-about-us",
+      "label": "About Us",
+      "url": "/about-us",
+      "parentId": "",
+      "menuOrder": 20,
+      "visible": true
+    },
+    {
+      "id": "menu-delivery",
+      "label": "Delivery Information",
+      "url": "/delivery",
+      "parentId": "menu-about-us",
+      "menuOrder": 21,
+      "visible": true
+    },
+    {
+      "id": "menu-returns",
+      "label": "Returns Policy",
+      "url": "/returns",
+      "parentId": "menu-about-us",
+      "menuOrder": 22,
+      "visible": true
+    },
+    {
+      "id": "menu-privacy",
+      "label": "Privacy Policy",
+      "url": "/privacy",
+      "parentId": "menu-about-us",
+      "menuOrder": 23,
+      "visible": true
+    },
+    {
+      "id": "menu-news",
+      "label": "News",
+      "url": "/news",
+      "parentId": "",
+      "menuOrder": 25,
+      "visible": true
+    },
+    {
+      "id": "menu-shop",
+      "label": "Shop",
+      "url": "/products",
+      "parentId": "",
+      "menuOrder": 30,
+      "visible": true
+    },
+    {
+      "id": "menu-account",
+      "label": "My Account",
+      "url": "/account",
+      "parentId": "",
+      "menuOrder": 40,
+      "visible": true
+    },
+    {
+      "id": "menu-faq",
+      "label": "FAQ",
+      "url": "/faq",
+      "parentId": "",
+      "menuOrder": 50,
+      "visible": true
+    },
+    {
+      "id": "menu-contact",
+      "label": "Contact Us",
+      "url": "/contact",
+      "parentId": "",
+      "menuOrder": 60,
+      "visible": true
+    }
+  ],
+  "settings": {
+    "theme": "commerce-pro",
+    "themeBoxBackgrounds": {
+      "homeBox": "",
+      "winSetup": "",
+      "seasonDeals": "",
+      "whyChoose": "",
+      "offerWeek": ""
+    },
+    "themeBoxColours": {
+      "homeBox": "#1d2d20",
+      "winSetup": "#263821",
+      "seasonDeals": "#6b3f16",
+      "whyChoose": "#1d2d20",
+      "offerWeek": "#1d2d20",
+      "product": "#586d34",
+      "category": "#24351f"
+    },
+    "logoSize": 42,
+    "imageOptimization": {
+      "enabled": false,
+      "responsiveImages": true,
+      "lazyLoading": true,
+      "decoding": "async"
+    },
+    "headerLogoPaddingTop": 18,
+    "headerLogoPaddingBottom": 18,
+    "adminThemeEnabled": true,
+    "accountThemeEnabled": true
+  },
+  "roles": {
+    "viewer": {
+      "label": "Viewer",
+      "permissions": {
+        "dashboard": [
+          "read"
+        ],
+        "pages": [
+          "read"
+        ],
+        "posts": [
+          "read"
+        ],
+        "products": [
+          "read"
+        ],
+        "productCategories": [
+          "read"
+        ],
+        "orders": [
+          "read"
+        ],
+        "users": [
+          "read"
+        ],
+        "comments": [
+          "read"
+        ],
+        "reviews": [
+          "read"
+        ],
+        "media": [
+          "read"
+        ],
+        "settings": [
+          "read"
+        ],
+        "audit": [
+          "read"
+        ],
+        "support": [
+          "read"
+        ],
+        "backups": [
+          "read"
+        ],
+        "notifications": [
+          "read"
+        ],
+        "emails": [
+          "read"
+        ],
+        "jobs": [
+          "read"
+        ],
+        "errorLogs": [
+          "read"
+        ],
+        "menuItems": [
+          "read"
+        ]
+      }
+    }
+  },
+  "backups": [],
+  "users": [
+    {
+      "id": "user-james-viewer",
+      "name": "James",
+      "email": "james",
+      "passwordHash": "seeded-by-server",
+      "role": "viewer",
+      "status": "active",
+      "twoFactorEnabled": false
+    }
+  ],
+  "blogCategories": [
+    {
+      "id": "blog-cat-news",
+      "name": "News",
+      "slug": "news",
+      "description": "Latest website updates and announcements.",
+      "createdAt": "2026-05-09T00:00:00.000Z",
+      "updatedAt": "2026-05-09T00:00:00.000Z"
+    },
+    {
+      "id": "blog-cat-guides",
+      "name": "Guides",
+      "slug": "guides",
+      "description": "Helpful guides and articles.",
+      "createdAt": "2026-05-09T00:00:00.000Z",
+      "updatedAt": "2026-05-09T00:00:00.000Z"
+    }
+  ],
+  "posts": [
+    {
+      "id": "post-welcome-blog",
+      "title": "Welcome to Our Blog",
+      "slug": "welcome-to-our-blog",
+      "excerpt": "Latest updates, articles and helpful buying guides will appear here.",
+      "content": "<p>Welcome to the blog. This section is for news, buying guides, product updates and useful articles.</p>",
+      "status": "published",
+      "categoryId": "blog-cat-news",
+      "author": "Admin",
+      "featuredImage": "",
+      "seoTitle": "Welcome to Our Blog",
+      "seoDescription": "Read the latest news, guides and updates.",
+      "publishedAt": "2026-05-09T00:00:00.000Z",
+      "createdAt": "2026-05-09T00:00:00.000Z",
+      "updatedAt": "2026-05-09T00:00:00.000Z"
+    }
+  ]
+}
