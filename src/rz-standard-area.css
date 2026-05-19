@@ -183,3 +183,33 @@ p{font-size:13px!important;line-height:1.4!important;color:var(--std-muted)!impo
   }
   .saved-address-grid,.address-grid{grid-template-columns:1fr!important}
 }
+/* Append this directly to the bottom of src/rz-standard-area.css */
+
+:root {
+  --std-bg: #f4f8f5 !important;
+  --std-panel: #ffffff !important;
+  --std-text: #121e15 !important;
+  --std-line: #cfe3d4 !important;
+  --std-green: #2f9e44 !important;
+  --std-green-dark: #1e7e34 !important;
+  --std-hover: #eef7ee !important;
+}
+
+* {
+  border-radius: 4px !important;
+}
+
+.sidebar, .admin-sidebar {
+  background: #121e15 !important;
+}
+
+.sidebar button, .admin-sidebar a, .sidebar a {
+  background: transparent !important;
+  color: #cbd5e1 !important;
+  border: none !important;
+}
+
+.sidebar button:hover, .admin-sidebar a:hover, .sidebar button.active {
+  background: #2f9e44 !important;
+  color: #ffffff !important;
+}
