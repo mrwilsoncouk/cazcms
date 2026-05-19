@@ -1,0 +1,170 @@
+/* ==========================================================================
+   PP UNIVERSAL THEME CONFIGURATION (STOREFRONT, ADMIN, LOGINS, ACCOUNTS)
+   ========================================================================== */
+
+:root {
+  --pp-bg-base: #f3f7f4;
+  --pp-surface: #ffffff;
+  --pp-border: #cfe3d4;
+  --pp-text-main: #0f1a12;
+  --pp-text-muted: #526356;
+  --pp-brand: #2f9e44;
+  --pp-brand-dark: #1e7e34;
+  --pp-brand-light: #eef7ee;
+  --pp-radius: 4px;
+}
+
+/* --- Global Elements Normalization Overrides --- */
+html.pp-theme-active, 
+body.pp-theme, 
+.pp-theme-active body {
+  background: var(--pp-bg-base) !important;
+  color: var(--pp-text-main) !important;
+  font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, sans-serif !important;
+}
+
+/* --- 1. Main Website Storefront Layout --- */
+.pp-theme-active header, 
+.pp-theme-active .site-header, 
+.pp-theme-active footer,
+.pp-theme-active footer.site-footer {
+  background: var(--pp-text-main) !important;
+  color: #ffffff !important;
+  border: none !important;
+  padding: 24px !important;
+}
+.pp-theme-active header a, 
+.pp-theme-active footer a,
+.pp-theme-active header strong {
+  color: #ffffff !important;
+  text-decoration: none !important;
+  font-weight: 700 !important;
+}
+.pp-theme-active header nav a {
+  margin-left: 15px !important;
+  background: var(--pp-brand) !important;
+  padding: 6px 12px !important;
+  border-radius: var(--pp-radius) !important;
+}
+
+/* --- 2. Shared Interface Content Panels (Tables, Grids, Admin Forms) --- */
+body.pp-theme .card, 
+body.pp-theme .panel, 
+body.pp-theme .box, 
+body.pp-theme table,
+body.pp-theme .saved-section,
+body.pp-theme .product-card,
+body.pp-theme .content,
+body.pp-theme main.content,
+body.pp-theme .topbar {
+  background: var(--pp-surface) !important;
+  border: 1px solid var(--pp-border) !important;
+  border-radius: var(--pp-radius) !important;
+  box-shadow: 0 4px 12px rgba(15, 26, 18, 0.04) !important;
+  color: var(--pp-text-main) !important;
+}
+
+/* --- 3. Form Input Controllers & Fields --- */
+body.pp-theme input, 
+body.pp-theme textarea, 
+body.pp-theme select {
+  background: var(--pp-surface) !important;
+  color: var(--pp-text-main) !important;
+  border: 1px solid var(--pp-border) !important;
+  border-radius: var(--pp-radius) !important;
+  padding: 10px 12px !important;
+  font-family: inherit !important;
+}
+body.pp-theme input:focus, 
+body.pp-theme textarea:focus, 
+body.pp-theme select:focus {
+  border-color: var(--pp-brand) !important;
+  outline: none !important;
+  box-shadow: 0 0 0 3px var(--pp-brand-light) !important;
+}
+
+/* --- 4. Interactive Action Buttons --- */
+body.pp-theme button, 
+body.pp-theme .btn, 
+body.pp-theme .button,
+body.pp-theme input[type="submit"],
+body.pp-theme form button[type="submit"] {
+  background: var(--pp-brand) !important;
+  color: #ffffff !important;
+  border: 1px solid var(--pp-brand-dark) !important;
+  border-radius: var(--pp-radius) !important;
+  font-weight: 700 !important;
+  padding: 9px 16px !important;
+  cursor: pointer !important;
+  transition: all 0.15s ease-in-out !important;
+  text-decoration: none !important;
+}
+body.pp-theme button:hover, 
+body.pp-theme .btn:hover,
+body.pp-theme input[type="submit"]:hover {
+  background: var(--pp-brand-dark) !important;
+  border-color: var(--pp-brand-dark) !important;
+}
+body.pp-theme button.secondary,
+body.pp-theme .button.secondary {
+  background: var(--pp-brand-light) !important;
+  color: var(--pp-brand-dark) !important;
+  border: 1px solid var(--pp-border) !important;
+}
+
+/* --- 5. Navigation Sidebars (Admin Boards & User Accounts) --- */
+body.pp-theme .sidebar, 
+body.pp-theme .admin-sidebar, 
+body.pp-theme .nav, 
+body.pp-theme .side-nav, 
+body.pp-theme .account-sidebar {
+  background: var(--pp-surface) !important;
+  border: none !important;
+  border-right: 1px solid var(--pp-border) !important;
+  padding: 15px !important;
+}
+body.pp-theme .sidebar button, 
+body.pp-theme .admin-sidebar button,
+body.pp-theme .sidebar a, 
+body.pp-theme .account-sidebar a,
+body.pp-theme .account-sidebar button {
+  background: transparent !important;
+  color: var(--pp-text-muted) !important;
+  border: none !important;
+  padding: 11px 14px !important;
+  margin-bottom: 4px !important;
+  border-radius: var(--pp-radius) !important;
+  font-weight: 500 !important;
+  text-align: left !important;
+}
+body.pp-theme .sidebar button:hover, 
+body.pp-theme .sidebar button.active, 
+body.pp-theme .admin-sidebar button.active,
+body.pp-theme .sidebar a:hover,
+body.pp-theme .account-sidebar a:hover {
+  background: var(--pp-brand-light) !important;
+  color: var(--pp-brand-dark) !important;
+  font-weight: 700 !important;
+}
+
+/* --- 6. Standalone Authentication Frameworks (Logins / Registers) --- */
+body.pp-theme .login-page, 
+body.pp-theme .admin-login, 
+body.pp-theme .auth-page, 
+body.pp-theme .login-wrap, 
+body.pp-theme .auth-wrap {
+  background: linear-gradient(145deg, var(--pp-brand-light) 0%, var(--pp-bg-base) 100%) !important;
+  display: grid !important;
+  place-items: center !important;
+}
+body.pp-theme .login, 
+body.pp-theme .login-box, 
+body.pp-theme .auth-card, 
+body.pp-theme .login-card,
+body.pp-theme form.login {
+  background: var(--pp-surface) !important;
+  border: 1px solid var(--pp-border) !important;
+  border-radius: 6px !important;
+  box-shadow: 0 10px 30px rgba(15, 26, 18, 0.08) !important;
+  padding: 35px !important;
+}
