@@ -181,3 +181,20 @@ body.pp-theme .card, body.pp-theme .panel {
 @media(max-width:768px){
   .products-grid, .product-grid, .shop-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
+/* Append this directly to the bottom of src/rz-green-storefront.css */
+
+body.rz-green-storefront, body.pp-theme {
+  background: #f4f8f5 !important;
+  color: #121e15 !important;
+}
+
+.rz-green-storefront header, .pp-theme header {
+  background: #121e15 !important;
+  border-bottom: 2px solid #2f9e44 !important;
+}
+
+.rz-green-storefront button, .pp-theme button, .btn, .add-to-cart {
+  background: #2f9e44 !important;
+  border-color: #1e7e34 !important;
+  border-radius: 4px !important;
+}
