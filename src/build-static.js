@@ -1,8 +1,33 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import crypto from 'node:crypto';
-import { find, one, insert } from './core/store.js';
+import { find, one, insert, update } from './core/store.js';
 import { buildSearchIndex, buildRouteManifest, buildPrecomputedNavigation, compressStaticFiles, checkPerformanceBudget } from './modules/performance.js';
+
+// --- CLOUD LIVE SEED ENFORCEMENT ---
+// Enforce registration of the PP Theme into the storage engine automatically upon deployment
+const activeThemeHandle = 'pp';
+const targetThemeRecord = one('themes', t => t.handle === activeThemeHandle);
+
+if (!targetThemeRecord) {
+    insert('themes', {
+        name: 'PP Premium Corporate Theme',
+        handle: activeThemeHandle,
+        enabled: true,
+        tokens: {
+            color: '#121e15',
+            accent: '#2f9e44',
+            bg_main: '#f4f8f5',
+            panel: '#ffffff',
+            font: 'Inter, system-ui, -apple-system, sans-serif'
+        },
+        layouts: { header: 'PP Corporate Nav', footer: 'PP Corporate Footer' },
+        templates: { post: 'post.html', page: 'page.html', product: 'product.html' }
+    });
+} else if (!targetThemeRecord.enabled) {
+    // Force set enabled flag to true if it was historically generated but turned off
+    update('themes', targetThemeRecord.id, { enabled: true });
+}
 
 const OUT = 'public/site';
 const ASSETS = path.join(OUT, 'assets');
@@ -14,27 +39,19 @@ const minHtml = s => String(s).replace(/>\s+</g, '><').replace(/\s{2,}/g, ' ').t
 const minCss = s => String(s).replace(/\/\*[\s\S]*?\*\//g, '').replace(/\s+/g, ' ').replace(/\s*([{}:;,>])\s*/g, '$1').trim();
 const hash = s => crypto.createHash('sha1').update(s).digest('hex').slice(0, 10);
 
-/**
- * Handles atomic staging operations safely to prevent active write read collisions.
- */
 function writeStaticFileAtomic(targetFilePath, fileContent) {
     const resolvedPath = path.resolve(targetFilePath);
     const directory = path.dirname(resolvedPath);
-
     if (!fs.existsSync(directory)) {
         fs.mkdirSync(directory, { recursive: true });
     }
-
     const tempFilePath = path.join(directory, `.tmp_${path.basename(resolvedPath)}`);
-
     try {
         fs.writeFileSync(tempFilePath, fileContent, 'utf8');
         fs.renameSync(tempFilePath, resolvedPath);
     } catch (error) {
         if (fs.existsSync(tempFilePath)) {
-            try {
-                fs.unlinkSync(tempFilePath);
-            } catch (_) {}
+            try { fs.unlinkSync(tempFilePath); } catch (_) {}
         }
         throw error;
     }
@@ -45,7 +62,6 @@ function writeHashed(name, content) {
     const base = path.basename(name, ext);
     const file = `${base}.${hash(content)}${ext}`;
     const destination = path.join(ASSETS, file);
-    
     writeStaticFileAtomic(destination, content);
     return `/site/assets/${file}`;
 }
@@ -57,6 +73,7 @@ let content = find('content', c => (c.status === 'published' || (c.status === 's
 let products = find('products', p => (p.status || 'published') === 'published');
 const theme = one('themes', t => t.enabled) || {};
 
+// Cloud theme distribution tokens compilation mapper
 const criticalCss = minCss(`body{font-family:${theme.tokens?.font || 'system-ui'};margin:0;color:#111;background:#fff}header,footer{padding:24px;background:#f4f4f5}.wrap{max-width:1100px;margin:auto;padding:24px}.card{border:1px solid #ddd;border-radius:12px;padding:16px;margin:12px 0}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px}img{max-width:100%;height:auto}`);
 const deferredCss = minCss(`.lazy-widget{content-visibility:auto;contain-intrinsic-size:300px}.muted{color:#555}.price{font-weight:700}.breadcrumbs{font-size:14px;margin:8px 0}.skip-link{position:absolute;left:-999px}.skip-link:focus{left:12px;top:12px;background:#fff;padding:8px}`);
 const cssHref = writeHashed('site.css', deferredCss);
@@ -89,11 +106,10 @@ function productCard(p) {
 }
 
 const index = `<h1>${esc(site.name)}</h1>${content.slice(0, 50).map(c => `<article class="card"><h2><a href="/site/${esc(c.slug)}.html">${esc(c.title)}</a></h2><p>${esc(c.seo?.description || '')}</p></article>`).join('')}`;
-
 writeStaticFileAtomic(path.join(OUT, 'index.html'), page(site.name, index, { description: site.description || '' }, [{ label: 'Home' }]));
 
 for (const c of content) { 
-    writeStaticFileAtomic(path.join(OUT, `${c.slug}.html`), page(c.title, contentHtml(c), c.seo, [{ label: 'Home', href: '/site/index.html' }, { label: c.title }])); 
+    writeStaticFileAtomic(path.join(OUT, `${c.slug}.html`), page(c.title, contentHtml(c), c.seo, [{ label: 'Home', href: '/site/index.html' }, { label: c.title }]));
 }
 
 fs.mkdirSync(path.join(OUT, 'products'), { recursive: true });
