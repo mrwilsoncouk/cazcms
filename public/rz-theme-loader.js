@@ -1,33 +1,28 @@
 (function() {
-  // Always enforce the Premium PP theme configuration globally
-  const targetTheme = 'pp';
-  localStorage.setItem('cms_active_theme', targetTheme);
-
-  // Apply theme identifiers directly onto the DOM trees
+  // Enforce premium corporate styling across all administrative contexts
+  localStorage.setItem('cms_active_theme', 'pp');
   document.documentElement.classList.add('pp-theme-active');
   
-  function applyThemeClasses() {
+  function injectThemeClasses() {
     if (document.body && !document.body.classList.contains('pp-theme')) {
       document.body.classList.add('pp-theme');
     }
   }
 
-  // Execute classes assignment immediately and bind fallback loops for slower page requests
-  applyThemeClasses();
-  window.addEventListener('DOMContentLoaded', applyThemeClasses);
-  window.addEventListener('load', applyThemeClasses);
+  injectThemeClasses();
+  window.addEventListener('DOMContentLoaded', injectThemeClasses);
+  window.addEventListener('load', injectThemeClasses);
 
-  // Dynamically attach the master presentation cascading style definitions sheet
+  // Link the custom cloud-compiled CSS engine safely
   if (!document.getElementById('pp-universal-theme-styles')) {
     const link = document.createElement('link');
     link.id = 'pp-universal-theme-styles';
     link.rel = 'stylesheet';
     link.href = '/pp-universal.css';
     
-    // Inject style at the absolute top of head so it can process ahead of viewport paint triggers
-    const head = document.head || document.getElementsByTagName('head')[0];
-    if (head) {
-      head.insertBefore(link, head.firstChild);
+    const targetHead = document.head || document.getElementsByTagName('head')[0];
+    if (targetHead) {
+      targetHead.insertBefore(link, targetHead.firstChild);
     }
   }
 })();
