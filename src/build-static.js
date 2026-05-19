@@ -4,29 +4,26 @@ import crypto from 'node:crypto';
 import { find, one, insert, update } from './core/store.js';
 import { buildSearchIndex, buildRouteManifest, buildPrecomputedNavigation, compressStaticFiles, checkPerformanceBudget } from './modules/performance.js';
 
-// --- CLOUD LIVE SEED ENFORCEMENT ---
-// Enforce registration of the PP Theme into the storage engine automatically upon deployment
-const activeThemeHandle = 'pp';
-const targetThemeRecord = one('themes', t => t.handle === activeThemeHandle);
-
-if (!targetThemeRecord) {
+// --- PRODUCTION CLOUD SEEDING OVERRIDE ---
+// Automatically registers the 'pp' theme inside the store if it doesn't exist yet
+const targetTheme = one('themes', t => t.handle === 'pp');
+if (!targetTheme) {
     insert('themes', {
         name: 'PP Premium Corporate Theme',
-        handle: activeThemeHandle,
+        handle: 'pp',
         enabled: true,
         tokens: {
             color: '#121e15',
             accent: '#2f9e44',
             bg_main: '#f4f8f5',
             panel: '#ffffff',
-            font: 'Inter, system-ui, -apple-system, sans-serif'
+            font: 'Inter, system-ui, sans-serif'
         },
         layouts: { header: 'PP Corporate Nav', footer: 'PP Corporate Footer' },
         templates: { post: 'post.html', page: 'page.html', product: 'product.html' }
     });
-} else if (!targetThemeRecord.enabled) {
-    // Force set enabled flag to true if it was historically generated but turned off
-    update('themes', targetThemeRecord.id, { enabled: true });
+} else if (!targetTheme.enabled) {
+    update('themes', targetTheme.id, { enabled: true });
 }
 
 const OUT = 'public/site';
@@ -73,7 +70,6 @@ let content = find('content', c => (c.status === 'published' || (c.status === 's
 let products = find('products', p => (p.status || 'published') === 'published');
 const theme = one('themes', t => t.enabled) || {};
 
-// Cloud theme distribution tokens compilation mapper
 const criticalCss = minCss(`body{font-family:${theme.tokens?.font || 'system-ui'};margin:0;color:#111;background:#fff}header,footer{padding:24px;background:#f4f4f5}.wrap{max-width:1100px;margin:auto;padding:24px}.card{border:1px solid #ddd;border-radius:12px;padding:16px;margin:12px 0}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px}img{max-width:100%;height:auto}`);
 const deferredCss = minCss(`.lazy-widget{content-visibility:auto;contain-intrinsic-size:300px}.muted{color:#555}.price{font-weight:700}.breadcrumbs{font-size:14px;margin:8px 0}.skip-link{position:absolute;left:-999px}.skip-link:focus{left:12px;top:12px;background:#fff;padding:8px}`);
 const cssHref = writeHashed('site.css', deferredCss);
